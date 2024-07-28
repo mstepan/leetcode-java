@@ -11,12 +11,11 @@ import java.util.Objects;
 public class TotalAppealOfString {
 
     /**
-     * N = str.length()
-     * K = ('z' - 'a' + 1) = 26
+     * N = str.length() K = ('z' - 'a' + 1) = 26
      *
-     * time: O(N)
+     * <p>time: O(N)
      *
-     * space: O(K)
+     * <p>space: O(K)
      */
     public long appealSum(String str) {
         Objects.requireNonNull(str, "null 'str' detected");
