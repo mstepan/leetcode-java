@@ -216,7 +216,7 @@
                                                 <exclude>com.github.mstepan.leetcode.Main</exclude>
 
                                                 <!-- TODO: temporary removed from coverage -->
-<!--                                                <exclude>com.github.mstepan.leetcode.medium.*</exclude>-->
+                                                <exclude>com.github.mstepan.leetcode.medium.*</exclude>
                                                 <exclude>com.github.mstepan.leetcode.hard.*</exclude>
                                             </excludes>
                                         </rule>
