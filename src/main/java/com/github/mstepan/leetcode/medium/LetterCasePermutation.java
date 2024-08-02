@@ -11,18 +11,6 @@ import java.util.Objects;
  */
 public class LetterCasePermutation {
 
-    public static void main(String[] args) {
-
-        String str = "a1b2";
-        List<String> allPermutations = new LetterCasePermutation().letterCasePermutation(str);
-
-        for (String singlePerm : allPermutations) {
-            System.out.println(singlePerm);
-        }
-
-        System.out.println("LetterCasePermutation done...");
-    }
-
     /**
      * time: O(N * 2^lettersCount)
      *

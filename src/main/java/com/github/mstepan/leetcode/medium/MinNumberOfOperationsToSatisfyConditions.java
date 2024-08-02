@@ -7,21 +7,6 @@ package com.github.mstepan.leetcode.medium;
  */
 public class MinNumberOfOperationsToSatisfyConditions {
 
-    public static void main(String[] args) {
-
-        int[][] grid = {
-            {1, 1, 3},
-            {1, 2, 3},
-            {1, 1, 4},
-        };
-
-        int minOpsCount = new MinNumberOfOperationsToSatisfyConditions().minimumOperations(grid);
-
-        System.out.printf("minOpsCount: %d%n", minOpsCount);
-
-        System.out.println("MinNumberOfOperationsToSatisfyConditions main done...");
-    }
-
     /**
      * Use dynamic programming approach.
      *
@@ -98,12 +83,12 @@ public class MinNumberOfOperationsToSatisfyConditions {
         private final int[] freqCounters = new int[10];
 
         void add(int digit) {
-            assert digit >= 0 && digit < 10;
+            //            assert digit >= 0 && digit < 10;
             freqCounters[digit] += 1;
         }
 
         int count(int digit) {
-            assert digit >= 0 && digit < 10;
+            //            assert digit >= 0 && digit < 10;
             return freqCounters[digit];
         }
     }

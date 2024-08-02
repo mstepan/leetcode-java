@@ -11,27 +11,17 @@ import java.util.Objects;
  */
 public class DifferentWaysToAddParentheses {
 
-    public static void main(String[] args) {
-        List<Integer> result = new DifferentWaysToAddParentheses().diffWaysToCompute("2*3-4*5");
-
-        System.out.println(result);
-
-        System.out.println("DifferentWaysToAddParentheses done...");
-    }
-
     /** Time: O(C*n), where C = n-th Catalan number Space: O(N) */
     public List<Integer> diffWaysToCompute(String expression) {
         Objects.requireNonNull(expression);
 
         Token[] tokens = parse(expression);
 
-        List<Integer> results = eval(tokens, 0, tokens.length - 1);
-
-        return results;
+        return eval(tokens, 0, tokens.length - 1);
     }
 
     private List<Integer> eval(Token[] tokens, int start, int end) {
-        assert start >= end : "start < end";
+        //        assert start <= end : "start > end";
 
         if (start == end) {
             return List.of(((NumberToken) tokens[start]).val());
@@ -41,12 +31,12 @@ public class DifferentWaysToAddParentheses {
 
         for (int mid = start; mid < end; mid += 2) {
             List<Integer> left = eval(tokens, start, mid);
-            assert left != null : "'left' is null";
+            //            assert left != null : "'left' is null";
 
             List<Integer> right = eval(tokens, mid + 2, end);
-            assert right != null : "'right' is null";
+            //            assert right != null : "'right' is null";
 
-            assert tokens[mid + 1] instanceof OperationToken : "Incorrect token type";
+            //            assert tokens[mid + 1] instanceof OperationToken : "Incorrect token type";
             OperationToken op = (OperationToken) tokens[mid + 1];
 
             for (int leftVal : left) {
@@ -76,17 +66,18 @@ public class DifferentWaysToAddParentheses {
 
                 while (pos < expression.length() && Character.isDigit(expression.charAt(pos))) {
                     number = 10 * number + (expression.charAt(pos) - '0');
-                    assert number < 100 : "Number is bigger than 100";
+                    //                    assert number < 100 : "Number is bigger than 100";
                     ++pos;
                 }
 
-                assert number >= 0 && number < 100
-                        : "Incorrect number, should be in range [0; 99], but found " + number;
+                //                assert number >= 0 && number < 100
+                //                        : "Incorrect number, should be in range [0; 99], but found
+                // " + number;
 
                 tokens.add(new NumberToken(number));
             } else {
-                assert ch == '+' || ch == '-' || ch == '*'
-                        : "Incorrect operation symbol detected: " + ch;
+                //                assert ch == '+' || ch == '-' || ch == '*'
+                //                        : "Incorrect operation symbol detected: " + ch;
                 tokens.add(new OperationToken(ch));
                 ++pos;
             }
