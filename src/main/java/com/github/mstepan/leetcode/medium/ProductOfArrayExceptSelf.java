@@ -1,6 +1,5 @@
 package com.github.mstepan.leetcode.medium;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -9,18 +8,6 @@ import java.util.Objects;
  * <p>https://leetcode.com/problems/product-of-array-except-self/
  */
 public class ProductOfArrayExceptSelf {
-
-    public static void main(String[] args) throws Exception {
-
-        int[] arr = {1, 2, 3, 4};
-
-        // expected = [24, 12, 8, 6]
-        int[] res = new ProductOfArrayExceptSelf().productExceptSelf(arr);
-
-        System.out.println(Arrays.toString(res));
-
-        System.out.println("ProductOfArrayExceptSelf done...");
-    }
 
     /** time: O(N) pace: O(N) */
     public int[] productExceptSelf(int[] arr) {
