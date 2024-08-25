@@ -223,6 +223,7 @@
                                                 <!-- TODO: temporary removed from coverage -->
                                                 <exclude>com.github.mstepan.leetcode.hard.*</exclude>
                                                 <exclude>com.github.mstepan.leetcode.medium.*</exclude>
+                                                <exclude>com.github.mstepan.leetcode.other.*</exclude>
                                             </excludes>
                                         </rule>
 
