@@ -1,70 +1,50 @@
 package com.github.mstepan.leetcode;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
 public class Main {
 
     public static void main(String[] args) throws Exception {
-
-        Map<Integer, Integer> map = new ConcurrentHashMap<>();
-
-        final int threadsCount = 200;
-        final int iterationsCount = 10_000;
-        final int dummyKey = 13;
-
-        ExecutorService pool = Executors.newFixedThreadPool(threadsCount);
-        CountDownLatch allCompleted = new CountDownLatch(threadsCount);
-
-        try {
-
-            for (int i = 0; i < threadsCount; ++i) {
-                pool.submit(
-                        () -> {
-                            try {
-                                for (int it = 0;
-                                        it < iterationsCount
-                                                && !Thread.currentThread().isInterrupted();
-                                        ++it) {
-
-                                    /*
-                                    Check of 'ConcurrentHashMap.compute(...)' method is fully thread safe.
-                                     */
-
-                                    map.compute(
-                                            dummyKey,
-                                            (key, count) -> count == null ? 1 : count + 1);
-                                }
-                            } finally {
-                                allCompleted.countDown();
-                            }
-                        });
-            }
-
-            allCompleted.await();
-
-            int expectedCount = threadsCount * iterationsCount;
-
-            if (expectedCount == map.get(dummyKey)) {
-                System.out.println("All good");
-            } else {
-                throw new IllegalStateException(
-                        "Incorrect value detected, expected = %d, found = %d"
-                                .formatted(expectedCount, map.get(dummyKey)));
-            }
-
-        } finally {
-            pool.shutdownNow();
-            boolean wasTerminated = pool.awaitTermination(1L, TimeUnit.SECONDS);
-            if (!wasTerminated) {
-                System.err.println("Pool wasn't terminated, timed out.");
-            }
-        }
+        System.out.println(finNextWithSmallFactors(100));
+        System.out.println(finNextWithSmallFactors(108));
+        System.out.println(finNextWithSmallFactors(1000));
+        System.out.println(finNextWithSmallFactors(3000));
 
         System.out.println("Main done...");
+    }
+
+    /**
+     * UVA - 11621: Small Factors https://vjudge.net/problem/UVA-11621
+     *
+     * <p>time: O(lgN) space: O(1)
+     */
+    private static int finNextWithSmallFactors(int val) {
+        assert val >= 0;
+
+        if (val == 0) {
+            return 0;
+        }
+
+        int minValue = Math.min(nextPow2(val), nextPow3(val));
+
+        for (int pow2Value = 2; pow2Value < val; pow2Value *= 2) {
+            int left = (int) Math.ceil((double) val / pow2Value);
+            minValue = Math.min(minValue, pow2Value * nextPow3(left));
+        }
+
+        return minValue;
+    }
+
+    private static int nextPow2(int val) {
+        int pow2 = logCeil(val, 2);
+        return (int) Math.pow(2.0, pow2);
+    }
+
+    private static int nextPow3(int val) {
+        int pow3 = logCeil(val, 3);
+        return (int) Math.pow(3.0, pow3);
+    }
+
+    private static int logCeil(int val, int base) {
+        assert base == 2 || base == 3;
+        return (int) Math.ceil(Math.log(val) / Math.log(base));
     }
 }
