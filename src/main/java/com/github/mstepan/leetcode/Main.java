@@ -3,10 +3,6 @@ package com.github.mstepan.leetcode;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        System.out.println(finNextWithSmallFactors(100));
-        System.out.println(finNextWithSmallFactors(108));
-        System.out.println(finNextWithSmallFactors(1000));
-        System.out.println(finNextWithSmallFactors(3000));
 
         System.out.println("Main done...");
     }
