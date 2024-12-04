@@ -1,6 +1,5 @@
 package com.github.mstepan.leetcode;
 
-
 import java.util.ArrayDeque;
 import java.util.Objects;
 import java.util.Queue;

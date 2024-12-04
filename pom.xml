@@ -218,7 +218,7 @@
 
                                                 <!-- Excluded from coverage -->
                                                 <exclude>com.github.mstepan.leetcode.concurrency.*</exclude>
-                                                <exclude>com.github.mstepan.leetcode.Main</exclude>
+                                                <exclude>com.github.mstepan.leetcode.*</exclude>
 
                                                 <!-- TODO: temporary removed from coverage -->
                                                 <exclude>com.github.mstepan.leetcode.hard.*</exclude>
