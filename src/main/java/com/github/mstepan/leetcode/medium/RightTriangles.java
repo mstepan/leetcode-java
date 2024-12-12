@@ -1,7 +1,5 @@
 package com.github.mstepan.leetcode.medium;
 
-import java.util.*;
-
 /**
  * 3128. Right Triangles
  *
@@ -14,7 +12,7 @@ public class RightTriangles {
      *
      * <p>time: O(N*M)
      *
-     * <p>space: O(1)
+     * <p>space: O(N+M)
      */
     public static long numberOfRightTriangles(int[][] grid) {
         checkIsMatrix(grid);
@@ -26,179 +24,35 @@ public class RightTriangles {
         final int rows = grid.length;
         final int cols = grid[0].length;
 
-        Set<Triangle> handledTriangles = new HashSet<>();
+        int[] rowsOnes = new int[rows];
+        int[] colsOnes = new int[cols];
 
+        // count 1s for every row and column and store inside 'rowsOnes' and 'colsOnes' arrays
         for (int row = 0; row < rows; ++row) {
             for (int col = 0; col < cols; ++col) {
-
                 checkBinaryDigit(grid[row][col]);
 
                 if (grid[row][col] == 1) {
-                    // case 1
-                    if (grid[row][prevCol(grid, col)] == 1
-                            && grid[nextRow(grid, row)][prevCol(grid, col)] == 1) {
-                        if (allCellsUnique(
-                                row,
-                                col,
-                                row,
-                                prevCol(grid, col),
-                                nextRow(grid, row),
-                                prevCol(grid, col))) {
-
-                            handledTriangles.add(
-                                    Triangle.fromRowsAndCols(
-                                            row,
-                                            col,
-                                            row,
-                                            prevCol(grid, col),
-                                            nextRow(grid, row),
-                                            prevCol(grid, col)));
-                        }
-                    }
-
-                    // case 2
-                    if (grid[row][nextCol(grid, col)] == 1
-                            && grid[nextRow(grid, row)][nextCol(grid, col)] == 1) {
-
-                        if (allCellsUnique(
-                                row,
-                                col,
-                                row,
-                                nextCol(grid, col),
-                                nextRow(grid, row),
-                                nextCol(grid, col))) {
-
-                            handledTriangles.add(
-                                    Triangle.fromRowsAndCols(
-                                            row,
-                                            col,
-                                            row,
-                                            nextCol(grid, col),
-                                            nextRow(grid, row),
-                                            nextCol(grid, col)));
-                        }
-                    }
-
-                    // case 3
-                    if (grid[nextRow(grid, row)][col] == 1
-                            && grid[nextRow(grid, row)][prevCol(grid, col)] == 1) {
-                        if (allCellsUnique(
-                                row,
-                                col,
-                                nextRow(grid, row),
-                                col,
-                                nextRow(grid, row),
-                                prevCol(grid, col))) {
-
-                            handledTriangles.add(
-                                    Triangle.fromRowsAndCols(
-                                            row,
-                                            col,
-                                            nextRow(grid, row),
-                                            col,
-                                            nextRow(grid, row),
-                                            prevCol(grid, col)));
-                        }
-                    }
-
-                    // case 4
-                    if (grid[nextRow(grid, row)][col] == 1
-                            && grid[nextRow(grid, row)][nextCol(grid, col)] == 1) {
-                        if (allCellsUnique(
-                                row,
-                                col,
-                                nextRow(grid, row),
-                                col,
-                                nextRow(grid, row),
-                                nextCol(grid, col))) {
-
-                            handledTriangles.add(
-                                    Triangle.fromRowsAndCols(
-                                            row,
-                                            col,
-                                            nextRow(grid, row),
-                                            col,
-                                            nextRow(grid, row),
-                                            nextCol(grid, col)));
-                        }
-                    }
+                    ++rowsOnes[row];
+                    ++colsOnes[col];
                 }
             }
         }
 
-        return handledTriangles.size();
-    }
+        long totalTrianglesCount = 0L;
+        for (int row = 0; row < rows; ++row) {
+            for (int col = 0; col < cols; ++col) {
+                if (grid[row][col] == 1) {
+                    assert rowsOnes[row] > 0;
+                    assert colsOnes[col] > 0;
 
-    private static class Cell implements Comparable<Cell> {
-        final int row;
-        final int col;
-
-        Cell(int row, int col) {
-            this.row = row;
-            this.col = col;
-        }
-
-        @Override
-        public int compareTo(Cell other) {
-            int cmp = Integer.compare(row, other.row);
-
-            if (cmp != 0) {
-                return cmp;
+                    int possibleRightTrianglesCount = (rowsOnes[row] - 1) * (colsOnes[col] - 1);
+                    totalTrianglesCount += possibleRightTrianglesCount;
+                }
             }
-
-            return Integer.compare(col, other.col);
         }
 
-        @Override
-        public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass()) return false;
-            Cell cell = (Cell) o;
-            return row == cell.row && col == cell.col;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(row, col);
-        }
-    }
-
-    private static class Triangle {
-        final List<Cell> cells;
-
-        public Triangle(List<Cell> cells) {
-            List<Cell> sortedCells = new ArrayList<>(cells);
-            Collections.sort(sortedCells);
-            this.cells = Collections.unmodifiableList(sortedCells);
-        }
-
-        public static Triangle fromRowsAndCols(
-                int row1, int col1, int row2, int col2, int row3, int col3) {
-            return new Triangle(
-                    List.of(new Cell(row1, col1), new Cell(row2, col2), new Cell(row3, col3)));
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass()) return false;
-            Triangle triangle = (Triangle) o;
-            return Objects.equals(cells, triangle.cells);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hashCode(cells);
-        }
-    }
-
-    private static boolean allCellsUnique(
-            int row1, int col1, int row2, int col2, int row3, int col3) {
-        return isDifferentCell(row1, col1, row2, col2)
-                && isDifferentCell(row1, col1, row3, col3)
-                && isDifferentCell(row2, col2, row3, col3);
-    }
-
-    private static boolean isDifferentCell(int row1, int col1, int row2, int col2) {
-        return row1 != row2 || col1 != col2;
+        return totalTrianglesCount;
     }
 
     private static void checkIsMatrix(int[][] grid) {
@@ -231,21 +85,5 @@ public class RightTriangles {
         if (!(value == 0 || value == 1)) {
             throw new IllegalArgumentException("'value' is not 0 or 1");
         }
-    }
-
-    private static int nextRow(int[][] grid, int row) {
-        return (row + 1) % grid.length;
-    }
-
-    //    private static int prevRow(int[][] grid, int row) {
-    //        return (row == 0) ? grid.length - 1 : row - 1;
-    //    }
-
-    private static int nextCol(int[][] grid, int col) {
-        return (col + 1) % grid[0].length;
-    }
-
-    private static int prevCol(int[][] grid, int col) {
-        return (col == 0) ? grid[0].length - 1 : col - 1;
     }
 }

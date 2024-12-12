@@ -3,7 +3,6 @@ package com.github.mstepan.leetcode.medium;
 import static com.github.mstepan.leetcode.medium.RightTriangles.numberOfRightTriangles;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class RightTrianglesTest {
@@ -84,9 +83,8 @@ public class RightTrianglesTest {
         assertEquals(1, numberOfRightTriangles(grid));
     }
 
-    @Disabled
     @Test
-    void failedCase() {
+    void caseWithRightTriangleNotAdjacentCells() {
 
         int[][] grid =
                 new int[][] {

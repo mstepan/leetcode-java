@@ -119,12 +119,6 @@
     </dependencyManagement>
 
     <dependencies>
-        <dependency>
-            <groupId>com.lmax</groupId>
-            <artifactId>disruptor</artifactId>
-            <version>${lmax.disruptor.version}</version>
-        </dependency>
-
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -137,12 +131,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>${mockito-version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <version>${assertj.version}</version>
@@ -152,7 +140,7 @@
     </dependencies>
 
     <profiles>
-        <!-- If there are Java sources, apply checkstyle, pmd, findbugs, code-coverage, etc. -->
+        <!-- If there are Java sources, apply code-coverage -->
         <profile>
             <id>profile-java-has-main-sources</id>
             <activation>
