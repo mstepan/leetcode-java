@@ -18,7 +18,7 @@ public class AlphabetBoardPathTest {
     }
 
     @Test
-    void word_using_last_cell_few_time() {
+    void wordUsingLastCellAsStartAndEndChars() {
         assertEquals("DDDDD!UUUUURRR!LLLDDDDD!", alphabetBoardPath("zdz"));
     }
 }
