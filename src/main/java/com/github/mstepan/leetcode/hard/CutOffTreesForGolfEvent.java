@@ -3,14 +3,14 @@ package com.github.mstepan.leetcode.hard;
 import java.util.*;
 
 /**
- * 675. Cut Off Trees for Golf Event
+ * 675. Cut Off Trees for Golf Event -> Time Limit Exceeded for the last test case.
  *
  * <p>https://leetcode.com/problems/cut-off-trees-for-golf-event/description/
  */
 public class CutOffTreesForGolfEvent {
 
     /**
-     * N = max(forest.size(), forest.get(0).size())
+     * N = max(rows, cols)
      *
      * <p>time: O(N^4) space: O(N^2)
      */
@@ -114,10 +114,10 @@ public class CutOffTreesForGolfEvent {
     private static List<Cell> nextCells(int[][] m, Cell cur) {
 
         int[][] offsets = {
-                {-1, 0},
-                {1, 0},
-                {0, -1},
-                {0, 1}
+            {-1, 0},
+            {1, 0},
+            {0, -1},
+            {0, 1}
         };
 
         final int rows = m.length;
@@ -148,5 +148,4 @@ public class CutOffTreesForGolfEvent {
     }
 
     record Path(Cell last, int length) {}
-
 }
