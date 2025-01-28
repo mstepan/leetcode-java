@@ -114,10 +114,10 @@ public class CutOffTreesForGolfEvent {
     private static List<Cell> nextCells(int[][] m, Cell cur) {
 
         int[][] offsets = {
-            {-1, 0},
-            {1, 0},
-            {0, -1},
-            {0, 1}
+                {-1, 0},
+                {1, 0},
+                {0, -1},
+                {0, 1}
         };
 
         final int rows = m.length;
@@ -148,4 +148,5 @@ public class CutOffTreesForGolfEvent {
     }
 
     record Path(Cell last, int length) {}
+
 }
