@@ -75,7 +75,7 @@ public class CutOffTreesForGolfEvent {
         return matrix;
     }
 
-    /** Uses bidirectional BFS to find the shortest path length between 'from' and 'to' cells. */
+    /** Uses bidirectional BFS (meet in the middle) to find the shortest path length between 'from' and 'to' cells. */
     private static int shortestPathLength(int[][] m, Cell from, Cell to) {
 
         if (m[from.row][from.col] == 0 || m[to.row][to.col] == 0) {
@@ -86,24 +86,30 @@ public class CutOffTreesForGolfEvent {
             return 0;
         }
 
-        Map<Cell, Integer> marked = new HashMap<>();
-        marked.put(from, 0);
+        Map<Cell, PartialSolution> marked = new HashMap<>();
+        marked.put(from, new PartialSolution(BfsSearchDirection.FORWARD, 0));
+        marked.put(to, new PartialSolution(BfsSearchDirection.BACKWARD, 1));
 
         Queue<Cell> q = new ArrayDeque<>();
         q.add(from);
+        q.add(to);
 
         while (!q.isEmpty()) {
             Cell cur = q.poll();
-            int curLength = marked.get(cur);
+            PartialSolution curSol = marked.get(cur);
 
             for (Cell next : nextCells(m, cur)) {
-                if (next.equals(to)) {
-                    return curLength + 1;
-                }
+                if (m[next.row][next.col] != 0) {
 
-                if (m[next.row][next.col] != 0 && !marked.containsKey(next)) {
-                    marked.put(next, curLength + 1);
-                    q.add(next);
+                    PartialSolution nextSol = marked.get(next);
+
+                    if (nextSol == null) {
+                        marked.put(next, new PartialSolution(curSol.direction, curSol.length + 1));
+                        q.add(next);
+                    } else if (curSol.direction != nextSol.direction) {
+                        // meet in the middle happened
+                        return curSol.length + nextSol.length;
+                    }
                 }
             }
         }
@@ -147,4 +153,10 @@ public class CutOffTreesForGolfEvent {
         private static final Comparator<Cell> HEIGHT_ASC = Comparator.comparingInt(Cell::height);
     }
 
+    record PartialSolution(BfsSearchDirection direction, int length) {}
+
+    enum BfsSearchDirection {
+        FORWARD,
+        BACKWARD
+    }
 }
