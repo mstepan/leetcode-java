@@ -25,6 +25,21 @@ public class CutOffTreesForGolfEventTest {
     }
 
     @Test
+    void case4() {
+        assertEquals(
+                57,
+                cutOffTree(
+                        fromMatrix(
+                                new int[][] {
+                                    {54581641, 64080174, 24346381, 69107959},
+                                    {86374198, 61363882, 68783324, 79706116},
+                                    {668150, 92178815, 89819108, 94701471},
+                                    {83920491, 22724204, 46281641, 47531096},
+                                    {89078499, 18904913, 25462145, 60813308}
+                                })));
+    }
+
+    @Test
     void caseWithBigMatrix() {
 
         // 540 ms
