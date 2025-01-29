@@ -75,7 +75,7 @@ public class CutOffTreesForGolfEvent {
         return matrix;
     }
 
-    /** Uses BFS to find the shortest path length between 'from' and 'to' cells. */
+    /** Uses bidirectional BFS to find the shortest path length between 'from' and 'to' cells. */
     private static int shortestPathLength(int[][] m, Cell from, Cell to) {
 
         if (m[from.row][from.col] == 0 || m[to.row][to.col] == 0) {
@@ -86,24 +86,24 @@ public class CutOffTreesForGolfEvent {
             return 0;
         }
 
-        Set<Cell> marked = new HashSet<>();
-        marked.add(from);
+        Map<Cell, Integer> marked = new HashMap<>();
+        marked.put(from, 0);
 
-        Queue<Path> q = new ArrayDeque<>();
-        q.add(new Path(from, 0));
+        Queue<Cell> q = new ArrayDeque<>();
+        q.add(from);
 
         while (!q.isEmpty()) {
-            Path curPath = q.poll();
-            Cell cur = curPath.last;
+            Cell cur = q.poll();
+            int curLength = marked.get(cur);
 
             for (Cell next : nextCells(m, cur)) {
                 if (next.equals(to)) {
-                    return curPath.length + 1;
+                    return curLength + 1;
                 }
 
-                if (m[next.row][next.col] != 0 && !marked.contains(next)) {
-                    marked.add(next);
-                    q.add(new Path(next, curPath.length + 1));
+                if (m[next.row][next.col] != 0 && !marked.containsKey(next)) {
+                    marked.put(next, curLength + 1);
+                    q.add(next);
                 }
             }
         }
@@ -147,5 +147,4 @@ public class CutOffTreesForGolfEvent {
         private static final Comparator<Cell> HEIGHT_ASC = Comparator.comparingInt(Cell::height);
     }
 
-    record Path(Cell last, int length) {}
 }
