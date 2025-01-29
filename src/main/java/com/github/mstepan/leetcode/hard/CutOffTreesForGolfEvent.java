@@ -75,7 +75,10 @@ public class CutOffTreesForGolfEvent {
         return matrix;
     }
 
-    /** Uses bidirectional BFS (meet in the middle) to find the shortest path length between 'from' and 'to' cells. */
+    /**
+     * Uses bidirectional BFS (meet in the middle) to find the shortest path length between 'from'
+     * and 'to' cells.
+     */
     private static int shortestPathLength(int[][] m, Cell from, Cell to) {
 
         if (m[from.row][from.col] == 0 || m[to.row][to.col] == 0) {
