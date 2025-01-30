@@ -41,10 +41,6 @@ public class CutOffTreesForGolfEventTest {
 
     @Test
     void caseWithBigMatrix() {
-
-        // 540 ms
-        long startTime = System.nanoTime();
-
         assertEquals(
                 392880,
                 cutOffTree(
@@ -405,10 +401,6 @@ public class CutOffTreesForGolfEventTest {
                                         94, 96, 98, 100
                                     }
                                 })));
-
-        long endTime = System.nanoTime();
-
-        System.out.printf("%.1f ms\n", (endTime - startTime) / 1e6);
     }
 
     static List<List<Integer>> fromMatrix(int[][] m) {

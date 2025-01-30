@@ -75,10 +75,7 @@ public class CutOffTreesForGolfEvent {
         return matrix;
     }
 
-    /**
-     * Uses bidirectional BFS (meet in the middle) to find the shortest path length between 'from'
-     * and 'to' cells.
-     */
+    /** Uses standard BFS to find the shortest path length between 'from' and 'to' cells. */
     private static int shortestPathLength(int[][] m, Cell from, Cell to) {
 
         if (m[from.row][from.col] == 0 || m[to.row][to.col] == 0) {
@@ -89,30 +86,24 @@ public class CutOffTreesForGolfEvent {
             return 0;
         }
 
-        Map<Cell, PartialSolution> marked = new HashMap<>();
-        marked.put(from, new PartialSolution(BfsSearchDirection.FORWARD, 0));
-        marked.put(to, new PartialSolution(BfsSearchDirection.BACKWARD, 1));
+        Set<Cell> marked = new HashSet<>();
+        marked.add(from);
 
-        Queue<Cell> q = new ArrayDeque<>();
-        q.add(from);
-        q.add(to);
+        Queue<Path> q = new ArrayDeque<>();
+        q.add(new Path(from, 0));
 
         while (!q.isEmpty()) {
-            Cell cur = q.poll();
-            PartialSolution curSol = marked.get(cur);
+            Path curPath = q.poll();
+            Cell cur = curPath.last;
 
             for (Cell next : nextCells(m, cur)) {
-                if (m[next.row][next.col] != 0) {
+                if (next.equals(to)) {
+                    return curPath.length + 1;
+                }
 
-                    PartialSolution nextSol = marked.get(next);
-
-                    if (nextSol == null) {
-                        marked.put(next, new PartialSolution(curSol.direction, curSol.length + 1));
-                        q.add(next);
-                    } else if (curSol.direction != nextSol.direction) {
-                        // meet in the middle happened
-                        return curSol.length + nextSol.length;
-                    }
+                if (m[next.row][next.col] != 0 && !marked.contains(next)) {
+                    marked.add(next);
+                    q.add(new Path(next, curPath.length + 1));
                 }
             }
         }
@@ -156,10 +147,5 @@ public class CutOffTreesForGolfEvent {
         private static final Comparator<Cell> HEIGHT_ASC = Comparator.comparingInt(Cell::height);
     }
 
-    record PartialSolution(BfsSearchDirection direction, int length) {}
-
-    enum BfsSearchDirection {
-        FORWARD,
-        BACKWARD
-    }
+    record Path(Cell last, int length) {}
 }
