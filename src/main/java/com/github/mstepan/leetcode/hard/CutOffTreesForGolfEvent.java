@@ -82,36 +82,50 @@ public class CutOffTreesForGolfEvent {
             return Integer.MAX_VALUE;
         }
 
-        if (from.equals(to)) {
+        if (from.isSameCell(to)) {
             return 0;
         }
+        final int rows = m.length;
+        final int cols = m[0].length;
 
-        Set<Cell> marked = new HashSet<>();
-        marked.add(from);
+        boolean[][] marked = new boolean[rows][cols];
+        marked[from.row][from.col] = true;
 
         Queue<Path> q = new ArrayDeque<>();
-        q.add(new Path(from, 0));
+        q.add(new Path(from));
+        int curLayerSize = 1;
+
+        int pathLength = 0;
 
         while (!q.isEmpty()) {
-            Path curPath = q.poll();
-            Cell cur = curPath.last;
 
-            for (Cell next : nextCells(m, cur)) {
-                if (next.equals(to)) {
-                    return curPath.length + 1;
-                }
+            int nextLayerSize = 0;
+            for(int i = 0; i < curLayerSize; ++i){
+                Path curPath = q.poll();
+                Cell cur = curPath.last;
 
-                if (m[next.row][next.col] != 0 && !marked.contains(next)) {
-                    marked.add(next);
-                    q.add(new Path(next, curPath.length + 1));
+                for (Cell next : nextCells(cur, rows, cols)) {
+                    if (next.isSameCell(to)) {
+                        return pathLength + 1;
+                    }
+
+                    if (m[next.row][next.col] != 0 && !marked[next.row][next.col]) {
+                        marked[next.row][next.col] = true;
+                        q.add(new Path(next));
+                        ++nextLayerSize;
+                    }
                 }
             }
+
+            ++pathLength;
+            curLayerSize = nextLayerSize;
+
         }
 
         return Integer.MAX_VALUE;
     }
 
-    private static List<Cell> nextCells(int[][] m, Cell cur) {
+    private static List<Cell> nextCells(Cell cur, int rows, int cols) {
 
         int[][] offsets = {
             {-1, 0},
@@ -120,10 +134,6 @@ public class CutOffTreesForGolfEvent {
             {0, 1}
         };
 
-        final int rows = m.length;
-
-        assert m.length > 0;
-        final int cols = m[0].length;
 
         List<Cell> res = new ArrayList<>();
 
@@ -134,9 +144,8 @@ public class CutOffTreesForGolfEvent {
             if (newRow >= 0
                     && newRow < rows
                     && newCol >= 0
-                    && newCol < cols
-                    && m[newRow][newCol] != 0) {
-                res.add(new Cell(m[newRow][newCol], newRow, newCol));
+                    && newCol < cols) {
+                res.add(new Cell(-1, newRow, newCol));
             }
         }
 
@@ -145,7 +154,11 @@ public class CutOffTreesForGolfEvent {
 
     record Cell(int height, int row, int col) {
         private static final Comparator<Cell> HEIGHT_ASC = Comparator.comparingInt(Cell::height);
+
+        public boolean isSameCell(Cell other) {
+            return row == other.row && col == other.col;
+        }
     }
 
-    record Path(Cell last, int length) {}
+    record Path(Cell last) {}
 }
