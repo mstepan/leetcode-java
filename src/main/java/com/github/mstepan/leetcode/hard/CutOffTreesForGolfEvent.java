@@ -3,7 +3,7 @@ package com.github.mstepan.leetcode.hard;
 import java.util.*;
 
 /**
- * 675. Cut Off Trees for Golf Event -> Time Limit Exceeded for the last test case.
+ * 675. Cut Off Trees for Golf Event
  *
  * <p>https://leetcode.com/problems/cut-off-trees-for-golf-event/description/
  */
@@ -91,8 +91,8 @@ public class CutOffTreesForGolfEvent {
         boolean[][] marked = new boolean[rows][cols];
         marked[from.row][from.col] = true;
 
-        Queue<Path> q = new ArrayDeque<>();
-        q.add(new Path(from));
+        Queue<Cell> q = new ArrayDeque<>();
+        q.add(from);
         int curLayerSize = 1;
 
         int pathLength = 0;
@@ -100,9 +100,8 @@ public class CutOffTreesForGolfEvent {
         while (!q.isEmpty()) {
 
             int nextLayerSize = 0;
-            for(int i = 0; i < curLayerSize; ++i){
-                Path curPath = q.poll();
-                Cell cur = curPath.last;
+            for (int i = 0; i < curLayerSize; ++i) {
+                Cell cur = q.poll();
 
                 for (Cell next : nextCells(cur, rows, cols)) {
                     if (next.isSameCell(to)) {
@@ -111,7 +110,7 @@ public class CutOffTreesForGolfEvent {
 
                     if (m[next.row][next.col] != 0 && !marked[next.row][next.col]) {
                         marked[next.row][next.col] = true;
-                        q.add(new Path(next));
+                        q.add(next);
                         ++nextLayerSize;
                     }
                 }
@@ -119,32 +118,26 @@ public class CutOffTreesForGolfEvent {
 
             ++pathLength;
             curLayerSize = nextLayerSize;
-
         }
 
         return Integer.MAX_VALUE;
     }
 
+    private static final int[][] OFFSETS = {
+        {-1, 0},
+        {1, 0},
+        {0, -1},
+        {0, 1}
+    };
+
     private static List<Cell> nextCells(Cell cur, int rows, int cols) {
-
-        int[][] offsets = {
-            {-1, 0},
-            {1, 0},
-            {0, -1},
-            {0, 1}
-        };
-
-
         List<Cell> res = new ArrayList<>();
 
-        for (int[] singleOffset : offsets) {
+        for (int[] singleOffset : OFFSETS) {
             int newRow = cur.row + singleOffset[0];
             int newCol = cur.col + singleOffset[1];
 
-            if (newRow >= 0
-                    && newRow < rows
-                    && newCol >= 0
-                    && newCol < cols) {
+            if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) {
                 res.add(new Cell(-1, newRow, newCol));
             }
         }
@@ -159,6 +152,4 @@ public class CutOffTreesForGolfEvent {
             return row == other.row && col == other.col;
         }
     }
-
-    record Path(Cell last) {}
 }
