@@ -50,7 +50,7 @@ public class CutOffTreesForGolfEvent {
         return stepsCnt;
     }
 
-    private static int[][] toMatrix(List<List<Integer>> forest) {
+    public static int[][] toMatrix(List<List<Integer>> forest) {
         int rows = forest.size();
 
         assert rows > 0;
@@ -76,7 +76,7 @@ public class CutOffTreesForGolfEvent {
     }
 
     /** Uses standard BFS to find the shortest path length between 'from' and 'to' cells. */
-    private static int shortestPathLength(int[][] m, Cell from, Cell to) {
+    public static int shortestPathLength(int[][] m, Cell from, Cell to) {
 
         if (m[from.row][from.col] == 0 || m[to.row][to.col] == 0) {
             return Integer.MAX_VALUE;
@@ -145,8 +145,8 @@ public class CutOffTreesForGolfEvent {
         return res;
     }
 
-    record Cell(int height, int row, int col) {
-        private static final Comparator<Cell> HEIGHT_ASC = Comparator.comparingInt(Cell::height);
+    public record Cell(int height, int row, int col) {
+        public static final Comparator<Cell> HEIGHT_ASC = Comparator.comparingInt(Cell::height);
 
         public boolean isSameCell(Cell other) {
             return row == other.row && col == other.col;
