@@ -17,7 +17,7 @@ public class PartitionArrayIntoTwoArraysToMinimizeSumDifference {
         long minDiff = Long.MAX_VALUE;
         long totalSum = sum(nums);
 
-        Iterator<Long> it = new CombinationsSumIterator(nums, nums.length / 2);
+        CombinationsSumIterator it = new CombinationsSumIterator(nums, nums.length / 2);
 
         while (it.hasNext()) {
             long leftSum = it.next();
@@ -41,15 +41,15 @@ public class PartitionArrayIntoTwoArraysToMinimizeSumDifference {
 
     static final class CombinationsSumIterator implements Iterator<Long> {
         private final int[] arr;
-        private final int combinationSize;
 
         private final Range[] ranges;
         private final int[] offsets;
 
+        private int producedCombinations;
+
         public CombinationsSumIterator(int[] arr, int combinationSize) {
             this.arr = Objects.requireNonNull(arr);
             assert combinationSize > 0 && combinationSize <= arr.length;
-            this.combinationSize = combinationSize;
             this.ranges = createRanges(arr, combinationSize);
             this.offsets = createOffsets(this.ranges);
         }
@@ -91,6 +91,7 @@ public class PartitionArrayIntoTwoArraysToMinimizeSumDifference {
 
             moveOffsetToNext();
 
+            ++producedCombinations;
             return value;
         }
 
