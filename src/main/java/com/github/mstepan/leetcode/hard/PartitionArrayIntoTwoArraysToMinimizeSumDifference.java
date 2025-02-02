@@ -17,11 +17,10 @@ public class PartitionArrayIntoTwoArraysToMinimizeSumDifference {
         long minDiff = Long.MAX_VALUE;
         long totalSum = sum(nums);
 
-        Iterator<int[]> it = new CombinationsIterator(nums, nums.length / 2);
+        Iterator<Long> it = new CombinationsSumIterator(nums, nums.length / 2);
 
         while (it.hasNext()) {
-            int[] subArray = it.next();
-            long leftSum = sum(subArray);
+            long leftSum = it.next();
             long rightSum = totalSum - leftSum;
 
             minDiff = Math.min(minDiff, Math.abs(leftSum - rightSum));
@@ -40,14 +39,14 @@ public class PartitionArrayIntoTwoArraysToMinimizeSumDifference {
         return sum;
     }
 
-    static final class CombinationsIterator implements Iterator<int[]> {
+    static final class CombinationsSumIterator implements Iterator<Long> {
         private final int[] arr;
         private final int combinationSize;
 
         private final Range[] ranges;
         private final int[] offsets;
 
-        public CombinationsIterator(int[] arr, int combinationSize) {
+        public CombinationsSumIterator(int[] arr, int combinationSize) {
             this.arr = Objects.requireNonNull(arr);
             assert combinationSize > 0 && combinationSize <= arr.length;
             this.combinationSize = combinationSize;
@@ -83,12 +82,12 @@ public class PartitionArrayIntoTwoArraysToMinimizeSumDifference {
         }
 
         @Override
-        public int[] next() {
+        public Long next() {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
 
-            int[] value = createValueFromOffsets();
+            Long value = createValueFromOffsets();
 
             moveOffsetToNext();
 
@@ -117,14 +116,13 @@ public class PartitionArrayIntoTwoArraysToMinimizeSumDifference {
             }
         }
 
-        private int[] createValueFromOffsets() {
-            int[] value = new int[combinationSize];
+        private long createValueFromOffsets() {
+            long value = 0L;
 
-            for (int i = 0; i < value.length; i++) {
-                assert i < offsets.length;
-                assert offsets[i] >= 0 && offsets[i] < arr.length;
+            for (int singleOffset : offsets) {
+                assert singleOffset >= 0 && singleOffset < arr.length;
 
-                value[i] = arr[offsets[i]];
+                value += arr[singleOffset];
             }
 
             return value;

@@ -41,26 +41,27 @@ public class PartitionArrayIntoTwoArraysToMinimizeSumDifferenceTest {
     void combinationsIteratorNormalCase() {
         int[] arr = {1, 2, 3, 4};
 
-        Iterator<int[]> it =
-                new PartitionArrayIntoTwoArraysToMinimizeSumDifference.CombinationsIterator(arr, 2);
+        Iterator<Long> it =
+                new PartitionArrayIntoTwoArraysToMinimizeSumDifference.CombinationsSumIterator(
+                        arr, 2);
 
         assertTrue(it.hasNext());
-        assertArrayEquals(new int[] {1, 2}, it.next());
+        assertEquals(3L, it.next());
 
         assertTrue(it.hasNext());
-        assertArrayEquals(new int[] {1, 3}, it.next());
+        assertEquals(4L, it.next());
 
         assertTrue(it.hasNext());
-        assertArrayEquals(new int[] {1, 4}, it.next());
+        assertEquals(5L, it.next());
 
         assertTrue(it.hasNext());
-        assertArrayEquals(new int[] {2, 3}, it.next());
+        assertEquals(5L, it.next());
 
         assertTrue(it.hasNext());
-        assertArrayEquals(new int[] {2, 4}, it.next());
+        assertEquals(6L, it.next());
 
         assertTrue(it.hasNext());
-        assertArrayEquals(new int[] {3, 4}, it.next());
+        assertEquals(7L, it.next());
 
         assertFalse(it.hasNext());
     }
@@ -69,11 +70,12 @@ public class PartitionArrayIntoTwoArraysToMinimizeSumDifferenceTest {
     void combinationsIteratorSingleCombination() {
         int[] arr = {1, 2, 3, 4};
 
-        Iterator<int[]> it =
-                new PartitionArrayIntoTwoArraysToMinimizeSumDifference.CombinationsIterator(arr, 4);
+        Iterator<Long> it =
+                new PartitionArrayIntoTwoArraysToMinimizeSumDifference.CombinationsSumIterator(
+                        arr, 4);
 
         assertTrue(it.hasNext());
-        assertArrayEquals(new int[] {1, 2, 3, 4}, it.next());
+        assertEquals(10L, it.next());
 
         assertFalse(it.hasNext());
     }
@@ -82,20 +84,21 @@ public class PartitionArrayIntoTwoArraysToMinimizeSumDifferenceTest {
     void combinationsIteratorOneElementCombination() {
         int[] arr = {1, 2, 3, 4};
 
-        Iterator<int[]> it =
-                new PartitionArrayIntoTwoArraysToMinimizeSumDifference.CombinationsIterator(arr, 1);
+        Iterator<Long> it =
+                new PartitionArrayIntoTwoArraysToMinimizeSumDifference.CombinationsSumIterator(
+                        arr, 1);
 
         assertTrue(it.hasNext());
-        assertArrayEquals(new int[] {1}, it.next());
+        assertEquals(1L, it.next());
 
         assertTrue(it.hasNext());
-        assertArrayEquals(new int[] {2}, it.next());
+        assertEquals(2L, it.next());
 
         assertTrue(it.hasNext());
-        assertArrayEquals(new int[] {3}, it.next());
+        assertEquals(3L, it.next());
 
         assertTrue(it.hasNext());
-        assertArrayEquals(new int[] {4}, it.next());
+        assertEquals(4L, it.next());
 
         assertFalse(it.hasNext());
     }
@@ -104,11 +107,12 @@ public class PartitionArrayIntoTwoArraysToMinimizeSumDifferenceTest {
     void combinationsIteratorOneElementArray() {
         int[] arr = {133};
 
-        Iterator<int[]> it =
-                new PartitionArrayIntoTwoArraysToMinimizeSumDifference.CombinationsIterator(arr, 1);
+        Iterator<Long> it =
+                new PartitionArrayIntoTwoArraysToMinimizeSumDifference.CombinationsSumIterator(
+                        arr, 1);
 
         assertTrue(it.hasNext());
-        assertArrayEquals(new int[] {133}, it.next());
+        assertEquals(133L, it.next());
 
         assertFalse(it.hasNext());
     }
