@@ -73,7 +73,12 @@ public class StrangePrinterTest {
     }
 
     @Test
-    void cornerCase() {
+    void cornerCase1() {
         assertEquals(4, strangePrinter("dcdbcb"));
+    }
+
+    @Test
+    void cornerCase2() {
+        assertEquals(17, strangePrinter("ccdcadbddbaddcbccdcdabcbcddbccdcbad"));
     }
 }
