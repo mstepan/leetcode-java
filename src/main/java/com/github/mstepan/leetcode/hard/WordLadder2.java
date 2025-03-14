@@ -31,7 +31,7 @@ public class WordLadder2 {
 
         for (String singleSeed : seeds) {
 
-            //TODO: merge paths with similar node
+            // TODO: merge paths with similar node
 
             if (singleSeed.equals(beginWord)) {
                 queue.add(new WordsPath(singleSeed));
@@ -56,8 +56,7 @@ public class WordLadder2 {
             while (!queue.isEmpty()) {
                 WordsPath curPath = queue.poll();
 
-                //TODO: merge paths with similar node
-
+                // TODO: merge paths with similar node
 
                 for (String singleNeighbour : g.findNeighbours(curPath.last())) {
 
