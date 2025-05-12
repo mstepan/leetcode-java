@@ -28,25 +28,19 @@ public class ZumaGameTest {
         assertEquals(2, findMinStep("RRWWRRBBRR", "WB"));
     }
 
-    // Time elapsed: 811.3 ms
-    // Time elapsed: 685.1 ms
-    // Time elapsed: 570.0 ms
-    // Time elapsed: 522.0 ms
     @Test
     void findMinStepCase5() {
-        long startTime = System.nanoTime();
         assertEquals(-1, findMinStep("RRGGBBYYWWRRGGBB", "RGBYW"));
-        long endTime = System.nanoTime();
-        System.out.printf("Time elapsed: %.1f ms%n", (endTime - startTime) / 1_000_000.0);
     }
 
-    // Time elapsed: 108.4 ms
     @Test
     void findMinStepCase6() {
-        long startTime = System.nanoTime();
         assertEquals(-1, findMinStep("WWRBBWWGGBBRRGWB", "WGGBB"));
-        long endTime = System.nanoTime();
-        System.out.printf("Time elapsed: %.1f ms%n", (endTime - startTime) / 1_000_000.0);
+    }
+
+    @Test
+    void findMinStepCase56() {
+        assertEquals(-1, findMinStep("WRBWYGRGYGWWBWRW", "YWGRB"));
     }
 
     @Test

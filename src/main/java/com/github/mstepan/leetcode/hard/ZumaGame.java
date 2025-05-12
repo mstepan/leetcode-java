@@ -10,18 +10,41 @@ import java.util.*;
 public class ZumaGame {
 
     public static int findMinStep(String board, String hand) {
-        checkValidColorString(board, "Invalid 'board'");
-        checkValidColorString(hand, "Invalid 'hand'");
+        //        checkValidColorString(board, "Invalid 'board'");
+        //        checkValidColorString(hand, "Invalid 'hand'");
 
         int handUsedMask = 0b11111 ^ ((1 << hand.length()) - 1);
 
-        return optSolutionRec(board, hand, handUsedMask, new HashMap<>());
+        return optSolutionRec(
+                canonicalForm(board), canonicalForm(hand), handUsedMask, new HashMap<>());
+    }
+
+    private static String canonicalForm(String str) {
+        StringBuilder buf = new StringBuilder(str.length());
+
+        for (int i = 0; i < str.length(); ++i) {
+
+            char other =
+                    switch (str.charAt(i)) {
+                        case 'R' -> 'A';
+                        case 'Y' -> 'B';
+                        case 'B' -> 'C';
+                        case 'G' -> 'D';
+                        case 'W' -> 'E';
+                        default -> throw new IllegalStateException(
+                                "Unexpected value: " + str.charAt(i));
+                    };
+
+            buf.append(other);
+        }
+
+        return buf.toString();
     }
 
     private static int optSolutionRec(
             String board, String hand, int handUsedMask, Map<Long, Integer> cache) {
-        assert board != null;
-        assert hand != null;
+        //        assert board != null;
+        //        assert hand != null;
 
         if (board.isEmpty()) {
             return 0;
@@ -166,9 +189,9 @@ public class ZumaGame {
     }
 
     static String calculateNextBoard(String board, int insertPlace, char handCh) {
-        assert board != null;
-        assert insertPlace >= 0 && insertPlace < board.length();
-        assert board.charAt(insertPlace) == handCh;
+        //        assert board != null;
+        //        assert insertPlace >= 0 && insertPlace < board.length();
+        //        assert board.charAt(insertPlace) == handCh;
 
         int length = runLength(board, insertPlace);
 
@@ -239,9 +262,6 @@ public class ZumaGame {
 
     // "WWRBBRWBBWWB" -> 0, 6, 9
     static List<Integer> findInsertPlaces(String board, char handCh) {
-        assert board != null;
-        assert isColorChar(handCh);
-
         List<Integer> insertPlaces = new ArrayList<>();
 
         char prev = ' ';
@@ -261,8 +281,8 @@ public class ZumaGame {
     }
 
     static String removeCharAt(String hand, int idx) {
-        assert hand != null;
-        assert idx >= 0 && idx < hand.length();
+        //        assert hand != null;
+        //        assert idx >= 0 && idx < hand.length();
 
         if (idx == 0) {
             return hand.substring(idx + 1);
@@ -275,30 +295,26 @@ public class ZumaGame {
         return hand.substring(0, idx) + hand.substring(idx + 1);
     }
 
-    private static void checkValidColorString(String str, String errorMsg) {
-        if (str == null) {
-            throw new IllegalArgumentException("%s, str = null".formatted(errorMsg));
-        }
+    //    private static void checkValidColorString(String str, String errorMsg) {
+    //        if (str == null) {
+    //            throw new IllegalArgumentException("%s, str = null".formatted(errorMsg));
+    //        }
+    //
+    //        for (int i = 0; i < str.length(); i++) {
+    //            if (!isColorChar(str.charAt(i))) {
+    //                throw new IllegalArgumentException("%s, str = %s".formatted(errorMsg, str));
+    //            }
+    //        }
+    //    }
 
-        for (int i = 0; i < str.length(); i++) {
-            if (!isColorChar(str.charAt(i))) {
-                throw new IllegalArgumentException("%s, str = %s".formatted(errorMsg, str));
-            }
-        }
-    }
+    private static final char FIRST_CH = 'A';
+    private static final char LAST_CH = 'E';
 
     private static boolean isColorChar(char ch) {
-        return ch == 'R' || ch == 'Y' || ch == 'B' || ch == 'G' || ch == 'W';
+        return ch >= FIRST_CH && ch <= LAST_CH;
     }
 
     private static int encodeColor(char ch) {
-        return switch (ch) {
-            case 'R' -> 0;
-            case 'Y' -> 1;
-            case 'B' -> 2;
-            case 'G' -> 3;
-            case 'W' -> 4;
-            default -> throw new IllegalStateException("Unexpected value: " + ch);
-        };
+        return ch - FIRST_CH;
     }
 }
