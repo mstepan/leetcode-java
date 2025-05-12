@@ -1,7 +1,6 @@
 package com.github.mstepan.leetcode.hard;
 
 import static com.github.mstepan.leetcode.hard.ZumaGame.findMinStep;
-
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -29,10 +28,8 @@ public class ZumaGameTest {
         assertEquals(2, findMinStep("RRWWRRBBRR", "WB"));
     }
 
-    // RRWWRRBBRWR
-
-    // Time elapsed: 786.8 ms
-    // Time elapsed: 890.5 ms
+    // Time elapsed: 811.3 ms
+    // Time elapsed: 685.1 ms
     @Test
     void findMinStepCase5() {
         long startTime = System.nanoTime();
@@ -41,6 +38,7 @@ public class ZumaGameTest {
         System.out.printf("Time elapsed: %.1f ms%n", (endTime - startTime) / 1_000_000.0);
     }
 
+    // Time elapsed: 108.4 ms
     @Test
     void findMinStepCase6() {
         long startTime = System.nanoTime();

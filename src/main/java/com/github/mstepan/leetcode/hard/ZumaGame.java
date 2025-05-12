@@ -19,7 +19,7 @@ public class ZumaGame {
     }
 
     private static int optSolutionRec(
-            String board, String hand, int handUsedMask, Map<SolutionState, Integer> cache) {
+            String board, String hand, int handUsedMask, Map<Long, Integer> cache) {
         assert board != null;
         assert hand != null;
 
@@ -31,7 +31,7 @@ public class ZumaGame {
             return -1;
         }
 
-        final SolutionState cacheKey = encodeAsKey(board, handUsedMask);
+        final long cacheKey = encodeAsKey(board, handUsedMask);
 
         Integer solution = cache.get(cacheKey);
 
@@ -68,21 +68,26 @@ public class ZumaGame {
                             recalculateForCurrent(bestSoFar, nextBoard, hand, newHandMask, cache);
                 }
 
-                // try to insert in any arbitrary place
-                for (int j = 0; j < board.length(); ++j) {
-                    if (board.charAt(j) != handCh) {
-                        String nextBoard = insertBefore(board, j, handCh);
+                // insert into arbitrary place only if 2 or more chars left at hand
+                if (leftInHand(handUsedMask) > 1) {
+                    // try to insert in any arbitrary place
+                    for (int j = 0; j < board.length(); ++j) {
+                        if (board.charAt(j) != handCh) {
+                            String nextBoard = insertBefore(board, j, handCh);
+
+                            bestSoFar =
+                                    recalculateForCurrent(
+                                            bestSoFar, nextBoard, hand, newHandMask, cache);
+                        }
+                    }
+
+                    // insert as a last character
+                    if (board.charAt(board.length() - 1) != handCh) {
+                        String nextBoard = board + handCh;
                         bestSoFar =
                                 recalculateForCurrent(
                                         bestSoFar, nextBoard, hand, newHandMask, cache);
                     }
-                }
-
-                // insert as a last character
-                if (board.charAt(board.length() - 1) != handCh) {
-                    String nextBoard = board + handCh;
-                    bestSoFar =
-                            recalculateForCurrent(bestSoFar, nextBoard, hand, newHandMask, cache);
                 }
             }
         }
@@ -92,14 +97,25 @@ public class ZumaGame {
         return bestSoFar;
     }
 
+    private static int leftInHand(int handUsedMask) {
+        int cnt = 0;
+
+        for (int i = 0; i < 5; ++i) {
+            if ((handUsedMask & (1 << i)) == 0) {
+                ++cnt;
+            }
+        }
+
+        return cnt;
+    }
+
     /*
-    Encode 'board' + 'hand' state as a single long value
-
+    Encode 'board' + 'hand' state.
     Max possible board length = 16 + 5 = 21
-
-    |21 * 3 = 63 bits|5 bits to encode board.length|5 bits for hand mask|
+    21 * 3 = 63 bits
+    5 bits for hand mask
     */
-    private static SolutionState encodeAsKey(String board, int handUsedMask) {
+    private static long encodeAsKey(String board, int handUsedMask) {
         long boardState = 0;
 
         for (int i = 0; i < board.length(); ++i) {
@@ -107,7 +123,7 @@ public class ZumaGame {
             boardState = (boardState << 3) | encodeSingleCh(ch);
         }
 
-        return new SolutionState(boardState, handUsedMask);
+        return (boardState << 5) | handUsedMask;
     }
 
     private static int encodeSingleCh(char ch) {
@@ -119,7 +135,7 @@ public class ZumaGame {
             String nextBoard,
             String hand,
             int newHandMask,
-            Map<SolutionState, Integer> cache) {
+            Map<Long, Integer> cache) {
         int bestCur = optSolutionRec(nextBoard, hand, newHandMask, cache);
 
         if (bestCur != -1) {
@@ -134,7 +150,6 @@ public class ZumaGame {
     }
 
     private static String insertBefore(String board, int idx, char handCh) {
-
         if (idx == 0) {
             return handCh + board;
         }
@@ -294,6 +309,4 @@ public class ZumaGame {
             return false;
         }
     }
-
-    record SolutionState(long boardState, int handUsedMask) {}
 }
