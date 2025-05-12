@@ -29,6 +29,10 @@ public class ZumaGameTest {
         assertEquals(2, findMinStep("RRWWRRBBRR", "WB"));
     }
 
+    // RRWWRRBBRWR
+
+    // Time elapsed: 786.8 ms
+    // Time elapsed: 890.5 ms
     @Test
     void findMinStepCase5() {
         long startTime = System.nanoTime();

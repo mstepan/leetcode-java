@@ -9,17 +9,17 @@ import java.util.*;
  */
 public class ZumaGame {
 
-    private static final Map<String, Integer> CACHE = new HashMap<>(2_000_000);
-
     public static int findMinStep(String board, String hand) {
         checkValidColorString(board, "Invalid 'board'");
         checkValidColorString(hand, "Invalid 'hand'");
 
-        CACHE.clear();
-        return optSolutionRec(board, hand, CACHE);
+        int handUsedMask = 0b11111 ^ ((1 << hand.length()) - 1);
+
+        return optSolutionRec(board, hand, handUsedMask, new HashMap<>());
     }
 
-    private static int optSolutionRec(String board, String hand, Map<String, Integer> cache) {
+    private static int optSolutionRec(
+            String board, String hand, int handUsedMask, Map<SolutionState, Integer> cache) {
         assert board != null;
         assert hand != null;
 
@@ -27,11 +27,11 @@ public class ZumaGame {
             return 0;
         }
 
-        if (hand.isEmpty()) {
+        if (handUsedMask == 0b11111) {
             return -1;
         }
 
-        final String cacheKey = board + ":" + hand;
+        final SolutionState cacheKey = encodeAsKey(board, handUsedMask);
 
         Integer solution = cache.get(cacheKey);
 
@@ -44,13 +44,19 @@ public class ZumaGame {
         int bestSoFar = -1;
 
         for (int i = 0; i < hand.length(); ++i) {
+
+            if ((handUsedMask & (1 << i)) != 0) {
+                // i-th hand character already used, just skip
+                continue;
+            }
+
             char handCh = hand.charAt(i);
 
             // insert only unique chars from HAND (duplicates will have similar effect)
             if (!alreadyHandled.contains(handCh)) {
                 alreadyHandled.add(handCh);
 
-                String handWithoutCh = removeCharAt(hand, i);
+                int newHandMask = handUsedMask ^ (1 << i); // removeCharAt(hand, i);
 
                 // Use 'handCh' to insert
                 List<Integer> insertPlaces = findInsertPlaces(board, handCh);
@@ -58,7 +64,8 @@ public class ZumaGame {
                 // try to insert into already existed sequence of same colors
                 for (int singlePlace : insertPlaces) {
                     String nextBoard = calculateNextBoard(board, singlePlace, handCh);
-                    bestSoFar = recalculateForCurrent(bestSoFar, nextBoard, handWithoutCh, cache);
+                    bestSoFar =
+                            recalculateForCurrent(bestSoFar, nextBoard, hand, newHandMask, cache);
                 }
 
                 // try to insert in any arbitrary place
@@ -66,14 +73,16 @@ public class ZumaGame {
                     if (board.charAt(j) != handCh) {
                         String nextBoard = insertBefore(board, j, handCh);
                         bestSoFar =
-                                recalculateForCurrent(bestSoFar, nextBoard, handWithoutCh, cache);
+                                recalculateForCurrent(
+                                        bestSoFar, nextBoard, hand, newHandMask, cache);
                     }
                 }
 
                 // insert as a last character
                 if (board.charAt(board.length() - 1) != handCh) {
                     String nextBoard = board + handCh;
-                    bestSoFar = recalculateForCurrent(bestSoFar, nextBoard, handWithoutCh, cache);
+                    bestSoFar =
+                            recalculateForCurrent(bestSoFar, nextBoard, hand, newHandMask, cache);
                 }
             }
         }
@@ -83,9 +92,35 @@ public class ZumaGame {
         return bestSoFar;
     }
 
+    /*
+    Encode 'board' + 'hand' state as a single long value
+
+    Max possible board length = 16 + 5 = 21
+
+    |21 * 3 = 63 bits|5 bits to encode board.length|5 bits for hand mask|
+    */
+    private static SolutionState encodeAsKey(String board, int handUsedMask) {
+        long boardState = 0;
+
+        for (int i = 0; i < board.length(); ++i) {
+            char ch = board.charAt(i);
+            boardState = (boardState << 3) | encodeSingleCh(ch);
+        }
+
+        return new SolutionState(boardState, handUsedMask);
+    }
+
+    private static int encodeSingleCh(char ch) {
+        return ValidColor.fromChar(ch).ordinal();
+    }
+
     private static int recalculateForCurrent(
-            int bestSoFar, String nextBoard, String handWithoutCh, Map<String, Integer> cache) {
-        int bestCur = optSolutionRec(nextBoard, handWithoutCh, cache);
+            int bestSoFar,
+            String nextBoard,
+            String hand,
+            int newHandMask,
+            Map<SolutionState, Integer> cache) {
+        int bestCur = optSolutionRec(nextBoard, hand, newHandMask, cache);
 
         if (bestCur != -1) {
             bestCur += 1;
@@ -177,7 +212,7 @@ public class ZumaGame {
     // "WWRBBRWBBWWB" -> 0, 6, 9
     static List<Integer> findInsertPlaces(String board, char handCh) {
         assert board != null;
-        assert COLORS.contains(handCh);
+        assert ValidColor.isColorChar(handCh);
 
         List<Integer> insertPlaces = new ArrayList<>();
 
@@ -218,15 +253,47 @@ public class ZumaGame {
         }
 
         for (int i = 0; i < str.length(); i++) {
-            if (!isColorChar(str.charAt(i))) {
+            if (!ValidColor.isColorChar(str.charAt(i))) {
                 throw new IllegalArgumentException("%s, str = %s".formatted(errorMsg, str));
             }
         }
     }
 
-    private static final Set<Character> COLORS = Set.of('R', 'Y', 'B', 'G', 'W');
+    enum ValidColor {
+        RED('R'),
+        YELLOW('Y'),
+        BLACK('B'),
+        GREEN('G'),
+        WHITE('W');
 
-    private static boolean isColorChar(char ch) {
-        return COLORS.contains(ch);
+        private final char ch;
+
+        ValidColor(char ch) {
+            this.ch = ch;
+        }
+
+        private static ValidColor fromChar(char ch) {
+
+            for (ValidColor color : ValidColor.values()) {
+                if (color.ch == ch) {
+                    return color;
+                }
+            }
+
+            throw new IllegalArgumentException("Invalid color: " + ch);
+        }
+
+        static boolean isColorChar(char ch) {
+
+            for (ValidColor color : ValidColor.values()) {
+                if (color.ch == ch) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
+
+    record SolutionState(long boardState, int handUsedMask) {}
 }
