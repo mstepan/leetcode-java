@@ -127,7 +127,7 @@ public class ZumaGame {
     }
 
     private static int encodeSingleCh(char ch) {
-        return ValidColor.fromChar(ch).ordinal();
+        return encodeColor(ch);
     }
 
     private static int recalculateForCurrent(
@@ -149,12 +149,20 @@ public class ZumaGame {
         return bestSoFar;
     }
 
+    private static final StringBuilder CONCAT_BUF = new StringBuilder();
+
     private static String insertBefore(String board, int idx, char handCh) {
         if (idx == 0) {
             return handCh + board;
         }
 
-        return board.substring(0, idx) + handCh + board.substring(idx);
+        CONCAT_BUF.setLength(0);
+
+        CONCAT_BUF.append(board, 0, idx);
+        CONCAT_BUF.append(handCh);
+        CONCAT_BUF.append(board, idx, board.length());
+
+        return CONCAT_BUF.toString(); // board.substring(0, idx) + handCh + board.substring(idx);
     }
 
     static String calculateNextBoard(String board, int insertPlace, char handCh) {
@@ -207,7 +215,12 @@ public class ZumaGame {
     }
 
     private static String concatParts(String board, int from1, int to1, int from2, int to2) {
-        return board.substring(from1, to1 + 1) + board.substring(from2, to2 + 1);
+        CONCAT_BUF.setLength(0);
+
+        CONCAT_BUF.append(board, from1, to1 + 1);
+        CONCAT_BUF.append(board, from2, to2 + 1);
+
+        return CONCAT_BUF.toString();
     }
 
     private static int runLength(String board, int insertPlace) {
@@ -227,7 +240,7 @@ public class ZumaGame {
     // "WWRBBRWBBWWB" -> 0, 6, 9
     static List<Integer> findInsertPlaces(String board, char handCh) {
         assert board != null;
-        assert ValidColor.isColorChar(handCh);
+        assert isColorChar(handCh);
 
         List<Integer> insertPlaces = new ArrayList<>();
 
@@ -268,45 +281,24 @@ public class ZumaGame {
         }
 
         for (int i = 0; i < str.length(); i++) {
-            if (!ValidColor.isColorChar(str.charAt(i))) {
+            if (!isColorChar(str.charAt(i))) {
                 throw new IllegalArgumentException("%s, str = %s".formatted(errorMsg, str));
             }
         }
     }
 
-    enum ValidColor {
-        RED('R'),
-        YELLOW('Y'),
-        BLACK('B'),
-        GREEN('G'),
-        WHITE('W');
+    private static boolean isColorChar(char ch) {
+        return ch == 'R' || ch == 'Y' || ch == 'B' || ch == 'G' || ch == 'W';
+    }
 
-        private final char ch;
-
-        ValidColor(char ch) {
-            this.ch = ch;
-        }
-
-        private static ValidColor fromChar(char ch) {
-
-            for (ValidColor color : ValidColor.values()) {
-                if (color.ch == ch) {
-                    return color;
-                }
-            }
-
-            throw new IllegalArgumentException("Invalid color: " + ch);
-        }
-
-        static boolean isColorChar(char ch) {
-
-            for (ValidColor color : ValidColor.values()) {
-                if (color.ch == ch) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
+    private static int encodeColor(char ch) {
+        return switch (ch) {
+            case 'R' -> 0;
+            case 'Y' -> 1;
+            case 'B' -> 2;
+            case 'G' -> 3;
+            case 'W' -> 4;
+            default -> throw new IllegalStateException("Unexpected value: " + ch);
+        };
     }
 }

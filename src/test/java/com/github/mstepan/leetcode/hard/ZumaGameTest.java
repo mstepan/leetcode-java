@@ -30,6 +30,8 @@ public class ZumaGameTest {
 
     // Time elapsed: 811.3 ms
     // Time elapsed: 685.1 ms
+    // Time elapsed: 570.0 ms
+    // Time elapsed: 522.0 ms
     @Test
     void findMinStepCase5() {
         long startTime = System.nanoTime();
