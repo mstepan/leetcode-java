@@ -2,7 +2,6 @@ package com.github.mstepan.leetcode.hard;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class ErectTheFenceTest {
@@ -45,7 +44,6 @@ public class ErectTheFenceTest {
                 .containsExactlyInAnyOrder(new int[] {1, 2}, new int[] {2, 2}, new int[] {4, 2});
     }
 
-    @Disabled
     @Test
     void outerTreesCase3() {
         int[][] actualRes =
