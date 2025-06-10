@@ -3,19 +3,13 @@ package com.github.mstepan.leetcode.medium;
 import java.util.Objects;
 
 public class ArithmeticSlices {
-    public static void main(String[] args) {
-        int[] arr = {1, 2, 3, 4};
-        int slicesCount = new ArithmeticSlices().numberOfArithmeticSlices(arr);
-
-        System.out.printf("slicesCount: %d%n", slicesCount);
-    }
 
     /**
      * time: O(N)
      *
      * <p>space: O(1)
      */
-    public int numberOfArithmeticSlices(int[] arr) {
+    public static int numberOfArithmeticSlices(int[] arr) {
         Objects.requireNonNull(arr, "null 'arr' detected");
 
         if (arr.length < 3) {

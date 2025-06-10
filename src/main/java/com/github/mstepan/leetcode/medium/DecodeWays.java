@@ -5,23 +5,11 @@ import java.util.Objects;
 /**
  * 91. Decode Ways
  *
- * <p>https://leetcode.com/problems/decode-ways/submissions/
+ * <p>https://leetcode.com/problems/decode-ways/description/
  */
 public class DecodeWays {
 
-    public static void main(String[] args) {
-
-        String str = "11106";
-
-        int waysCount = new DecodeWays().numDecodings(str);
-
-        System.out.printf("decode ways count: %d%n", waysCount);
-
-        System.out.println("DecodeWays done");
-    }
-
-    public int numDecodings(String str) {
-
+    public static int numDecodings(String str) {
         Objects.requireNonNull(str);
 
         char[] arr = str.toCharArray();

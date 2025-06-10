@@ -1,25 +1,14 @@
 package com.github.mstepan.leetcode.medium;
 
-import java.util.Arrays;
-
-/** 31. Next Permutation https://leetcode.com/problems/next-permutation/ */
+/**
+ * 31. Next Permutation
+ *
+ * <p>https://leetcode.com/problems/next-permutation/
+ */
 public class NextPermutation {
 
-    public static void main(String[] args) throws Exception {
-
-        int[] arr = new int[] {1, 2, 3};
-        System.out.println(Arrays.toString(arr));
-
-        for (int i = 0; i < 10; ++i) {
-            new NextPermutation().nextPermutation(arr);
-            System.out.println(Arrays.toString(arr));
-        }
-
-        System.out.println("NextPermutation done...");
-    }
-
     /** time: O(N) space: O(1), in-place */
-    public void nextPermutation(int[] arr) {
+    public static void nextPermutation(int[] arr) {
         for (int i = arr.length - 1; i > 0; --i) {
 
             // found place for next permutation
@@ -41,7 +30,7 @@ public class NextPermutation {
         reverseSubarray(arr, 0, arr.length - 1);
     }
 
-    private void reverseSubarray(int[] arr, int from, int to) {
+    private static void reverseSubarray(int[] arr, int from, int to) {
         assert arr != null;
         assert from >= 0 && from < arr.length;
         assert to >= 0 && to < arr.length;
@@ -57,13 +46,13 @@ public class NextPermutation {
         }
     }
 
-    private void swap(int[] arr, int from, int to) {
+    private static void swap(int[] arr, int from, int to) {
         int temp = arr[from];
         arr[from] = arr[to];
         arr[to] = temp;
     }
 
-    private int findBiggerFromTheEnd(int[] arr, int val) {
+    private static int findBiggerFromTheEnd(int[] arr, int val) {
 
         for (int i = arr.length - 1; i >= 0; --i) {
             if (arr[i] > val) {
