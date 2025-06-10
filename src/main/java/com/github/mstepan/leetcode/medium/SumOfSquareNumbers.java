@@ -6,19 +6,11 @@ https://leetcode.com/problems/sum-of-square-numbers/
 */
 public class SumOfSquareNumbers {
 
-    public static void main(String[] args) throws Exception {
-        int c = 4;
-        boolean hasSum = new SumOfSquareNumbers().judgeSquareSum(c);
-
-        System.out.printf("judgeSquareSum(%d) = %b%n", c, hasSum);
-        System.out.println("SumOfSquareNumbers done...");
-    }
-
     /*
     time: O(sqrt(N))
     space: O(1)
     */
-    public boolean judgeSquareSum(int n) {
+    public static boolean judgeSquareSum(int n) {
         if (n < 0) {
             throw new IllegalArgumentException("Negative value detected, 'c = %d'".formatted(n));
         }
@@ -49,7 +41,7 @@ public class SumOfSquareNumbers {
         return false;
     }
 
-    private boolean isPerfectSquare(int n) {
+    private static boolean isPerfectSquare(int n) {
         int sqrtVal = (int) Math.sqrt(n);
         return sqrtVal * sqrtVal == n;
     }
