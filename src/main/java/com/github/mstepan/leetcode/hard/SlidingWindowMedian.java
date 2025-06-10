@@ -2,7 +2,7 @@ package com.github.mstepan.leetcode.hard;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 480. Sliding Window Median
@@ -22,17 +22,17 @@ public class SlidingWindowMedian {
 
         MovingMedian median = new MovingMedian(k);
         for (int i = 0; i < k; ++i) {
-            median.add(nums[i]);
+            median.add(i, nums[i]);
         }
 
         res[0] = median.median();
 
         for (int i = 1; i < res.length; ++i) {
             int leftElem = nums[i - 1];
-            median.remove(leftElem);
+            median.remove(i - 1, leftElem);
 
             int rightElem = nums[i + k - 1];
-            median.add(rightElem);
+            median.add(i + k - 1, rightElem);
 
             res[i] = median.median();
         }
@@ -42,12 +42,56 @@ public class SlidingWindowMedian {
 
     static class MovingMedian {
 
+        enum HeapType {
+            MAX_HEAP,
+            MIN_HEAP
+        }
+
+        static final class HeapSlot {
+            final int initialArrIdx;
+            final int value;
+            int heapIdx;
+            HeapType heapType;
+
+            public HeapSlot(int initialArrIdx, int value) {
+                this.initialArrIdx = initialArrIdx;
+                this.value = value;
+                this.heapIdx = -1; // not in heap yet
+            }
+
+            String key() {
+                return "%d:%d".formatted(initialArrIdx, value);
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                if (obj == null || getClass() != obj.getClass()) {
+                    return false;
+                }
+
+                HeapSlot other = (HeapSlot) obj;
+                return value == other.value && initialArrIdx == other.initialArrIdx;
+            }
+
+            @Override
+            public int hashCode() {
+                return 31 * initialArrIdx + value;
+            }
+
+            @Override
+            public String toString() {
+                return "%d (%d)".formatted(value, initialArrIdx);
+            }
+        }
+
+        final Map<String, HeapSlot> heapSlots = new HashMap<>();
+
         final int windowSize;
 
-        final int[] maxHeap;
+        final HeapSlot[] maxHeap;
         int maxHeapSize;
 
-        final int[] minHeap;
+        final HeapSlot[] minHeap;
         int minHeapSize;
 
         MovingMedian(int windowSize) {
@@ -55,15 +99,15 @@ public class SlidingWindowMedian {
                 throw new IllegalArgumentException("Window size must be greater than zero");
             }
             this.windowSize = windowSize;
-            this.maxHeap = new int[windowSize / 2 + 2];
-            this.minHeap = new int[maxHeap.length];
+            this.maxHeap = new HeapSlot[windowSize / 2 + 2];
+            this.minHeap = new HeapSlot[maxHeap.length];
         }
 
-        void add(int value) {
-            if (maxHeapSize == 0 || maxHeap[0] >= value) {
-                addToHeap(maxHeap, value);
+        void add(int initialArrIdx, int value) {
+            if (maxHeapSize == 0 || maxHeap[0].value >= value) {
+                addToHeap(maxHeap, new HeapSlot(initialArrIdx, value));
             } else {
-                addToHeap(minHeap, value);
+                addToHeap(minHeap, new HeapSlot(initialArrIdx, value));
             }
 
             rebalance();
@@ -82,10 +126,13 @@ public class SlidingWindowMedian {
             }
         }
 
-        private void addToHeap(int[] heap, int value) {
+        private void addToHeap(HeapSlot[] heap, HeapSlot slot) {
             boolean isMaxHeap = heap == maxHeap;
 
-            heap[isMaxHeap ? maxHeapSize : minHeapSize] = value;
+            heap[isMaxHeap ? maxHeapSize : minHeapSize] = slot;
+            slot.heapType = isMaxHeap ? HeapType.MAX_HEAP : HeapType.MIN_HEAP;
+            slot.heapIdx = isMaxHeap ? maxHeapSize : minHeapSize;
+            heapSlots.put(slot.key(), slot);
 
             if (isMaxHeap) {
                 ++maxHeapSize;
@@ -98,7 +145,7 @@ public class SlidingWindowMedian {
         }
 
         /** Fix UP max or min heap from idx. */
-        private void fixUp(int[] heap, int start_idx) {
+        private void fixUp(HeapSlot[] heap, int start_idx) {
             final boolean isMaxHeap = (heap == maxHeap);
 
             int idx = start_idx;
@@ -106,11 +153,11 @@ public class SlidingWindowMedian {
                 int parentIdx = parentIdx(idx);
 
                 if (isMaxHeap) {
-                    if (heap[parentIdx] >= heap[idx]) {
+                    if (heap[parentIdx].value >= heap[idx].value) {
                         break;
                     }
                 } else {
-                    if (heap[parentIdx] <= heap[idx]) {
+                    if (heap[parentIdx].value <= heap[idx].value) {
                         break;
                     }
                 }
@@ -121,7 +168,7 @@ public class SlidingWindowMedian {
         }
 
         /** Fix DOWN max or min heap from idx. */
-        private void fixDown(int[] heap, int start_idx) {
+        private void fixDown(HeapSlot[] heap, int start_idx) {
             final boolean isMaxHeap = (heap == maxHeap);
 
             int idx = start_idx;
@@ -132,11 +179,13 @@ public class SlidingWindowMedian {
                 if (isMaxHeap) {
                     int maxIdx = idx;
 
-                    if (childIdx1 < maxHeapSize && maxHeap[childIdx1] > maxHeap[maxIdx]) {
+                    if (childIdx1 < maxHeapSize
+                            && maxHeap[childIdx1].value > maxHeap[maxIdx].value) {
                         maxIdx = childIdx1;
                     }
 
-                    if (childIdx2 < maxHeapSize && maxHeap[childIdx2] > maxHeap[maxIdx]) {
+                    if (childIdx2 < maxHeapSize
+                            && maxHeap[childIdx2].value > maxHeap[maxIdx].value) {
                         maxIdx = childIdx2;
                     }
 
@@ -150,11 +199,13 @@ public class SlidingWindowMedian {
                 } else {
                     int minIdx = idx;
 
-                    if (childIdx1 < minHeapSize && minHeap[childIdx1] < minHeap[minIdx]) {
+                    if (childIdx1 < minHeapSize
+                            && minHeap[childIdx1].value < minHeap[minIdx].value) {
                         minIdx = childIdx1;
                     }
 
-                    if (childIdx2 < minHeapSize && minHeap[childIdx2] < minHeap[minIdx]) {
+                    if (childIdx2 < minHeapSize
+                            && minHeap[childIdx2].value < minHeap[minIdx].value) {
                         minIdx = childIdx2;
                     }
 
@@ -169,14 +220,17 @@ public class SlidingWindowMedian {
             }
         }
 
-        private static void swap(int[] arr, int from, int to) {
+        private static void swap(HeapSlot[] arr, int from, int to) {
             if (from == to) {
                 return;
             }
 
-            int temp = arr[from];
+            HeapSlot temp = arr[from];
             arr[from] = arr[to];
             arr[to] = temp;
+
+            arr[from].heapIdx = from;
+            arr[to].heapIdx = to;
         }
 
         static int parentIdx(int idx) {
@@ -195,18 +249,22 @@ public class SlidingWindowMedian {
             return parentIdx * 2 + 2;
         }
 
-        private void moveOneElement(int[] fromHeap, int[] toHeap) {
+        private void moveOneElement(HeapSlot[] fromHeap, HeapSlot[] toHeap) {
             final boolean isMaxHeap = (fromHeap == maxHeap);
-            final int elemToMove = fromHeap[0];
+            final HeapSlot elemToMove = fromHeap[0];
 
             // Remove element from the heap
             if (isMaxHeap) {
                 maxHeap[0] = maxHeap[maxHeapSize - 1];
-                maxHeap[maxHeapSize - 1] = 0;
+                maxHeap[0].heapIdx = 0;
+
+                maxHeap[maxHeapSize - 1] = null;
                 --maxHeapSize;
             } else {
                 minHeap[0] = minHeap[minHeapSize - 1];
-                minHeap[minHeapSize - 1] = 0;
+                minHeap[0].heapIdx = 0;
+
+                minHeap[minHeapSize - 1] = null;
                 --minHeapSize;
             }
 
@@ -216,34 +274,38 @@ public class SlidingWindowMedian {
             addToHeap(toHeap, elemToMove);
         }
 
-        void remove(int valueToRemove) {
+        void remove(int initialArrIdx, int valueToRemove) {
             // search and remove from max heap
-            if (valueToRemove <= maxHeap[0]) {
-                int i = findValueIdx(maxHeap, valueToRemove);
-                assert i != -1 : "Value not found in max heap: " + valueToRemove;
+
+            // TODO: error here
+
+            HeapSlot foundSlot = findValueIdx(new HeapSlot(initialArrIdx, valueToRemove));
+            assert foundSlot != null : "Value not found in max heap: " + valueToRemove;
+            int i = foundSlot.heapIdx;
+
+            if (foundSlot.heapType == HeapType.MAX_HEAP) {
                 maxHeap[i] = maxHeap[maxHeapSize - 1];
-                maxHeap[maxHeapSize - 1] = 0;
+                maxHeap[i].heapIdx = i;
+
+                maxHeap[maxHeapSize - 1] = null;
                 --maxHeapSize;
 
                 if (i < maxHeapSize) {
-                    if (maxHeap[i] > valueToRemove) {
+                    if (maxHeap[i].value > valueToRemove) {
                         fixUp(maxHeap, i);
                     } else {
                         fixDown(maxHeap, i);
                     }
                 }
-
-            }
-            // search and remove from min heap
-            else {
-                int i = findValueIdx(minHeap, valueToRemove);
-                assert i != -1 : "Value not found in min  heap: " + valueToRemove;
+            } else {
                 minHeap[i] = minHeap[minHeapSize - 1];
-                minHeap[minHeapSize - 1] = 0;
+                minHeap[i].heapIdx = i;
+
+                minHeap[minHeapSize - 1] = null;
                 --minHeapSize;
 
                 if (i < minHeapSize) {
-                    if (minHeap[i] < valueToRemove) {
+                    if (minHeap[i].value < valueToRemove) {
                         fixUp(minHeap, i);
                     } else {
                         fixDown(minHeap, i);
@@ -255,19 +317,13 @@ public class SlidingWindowMedian {
         }
 
         /*
-        TODO: We can use HashMap to quickly find elements by index instead of doing linear search in O(N) time.
+        Use HashMap to find value in O(1) for deletion
          */
-        private int findValueIdx(int[] heap, int searchValue) {
-            int heapSize = heap == maxHeap ? maxHeapSize : minHeapSize;
+        private HeapSlot findValueIdx(HeapSlot searchValue) {
+            HeapSlot foundSlot = heapSlots.get(searchValue.key());
+            assert foundSlot != null;
 
-            for (int i = 0; i < heapSize; i++) {
-                if (heap[i] == searchValue) {
-
-                    return i;
-                }
-            }
-
-            return -1;
+            return foundSlot;
         }
 
         double median() {
@@ -277,11 +333,11 @@ public class SlidingWindowMedian {
 
             // max heap always bigger or equals to min heap
             if (maxHeapSize > minHeapSize) {
-                return maxHeap[0];
+                return maxHeap[0].value;
             }
 
-            BigDecimal first = BigDecimal.valueOf(maxHeap[0], 5);
-            BigDecimal second = BigDecimal.valueOf(minHeap[0], 5);
+            BigDecimal first = BigDecimal.valueOf(maxHeap[0].value, 5);
+            BigDecimal second = BigDecimal.valueOf(minHeap[0].value, 5);
 
             BigDecimal res =
                     first.add(second).divide(BigDecimal.valueOf(2, 5), RoundingMode.HALF_UP);

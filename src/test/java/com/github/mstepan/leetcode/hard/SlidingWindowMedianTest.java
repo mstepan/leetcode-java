@@ -17,23 +17,23 @@ public class SlidingWindowMedianTest {
     void movingMedianAddOperation() {
         MovingMedian movingMedian = new MovingMedian(5);
         // 20
-        movingMedian.add(20);
+        movingMedian.add(0, 20);
         assertThat(movingMedian.median()).isCloseTo(20.0, PERCENTAGE);
 
         // 13, 20
-        movingMedian.add(13);
+        movingMedian.add(1, 13);
         assertThat(movingMedian.median()).isCloseTo((13.0 + 20.0) / 2.0, PERCENTAGE);
 
         // 7, 13, 20
-        movingMedian.add(7);
+        movingMedian.add(2, 7);
         assertThat(movingMedian.median()).isCloseTo(13.0, PERCENTAGE);
 
         // 7, 9, 13, 20
-        movingMedian.add(9);
+        movingMedian.add(3, 9);
         assertThat(movingMedian.median()).isCloseTo((9.0 + 13.0) / 2.0, PERCENTAGE);
 
         // 7, 9, 13, 16, 20
-        movingMedian.add(16);
+        movingMedian.add(4, 16);
         assertThat(movingMedian.median()).isCloseTo(13.0, PERCENTAGE);
     }
 
@@ -42,46 +42,46 @@ public class SlidingWindowMedianTest {
         MovingMedian movingMedian = new MovingMedian(8);
 
         // 1, 4, 6, 10, 13, 16, 17, 20
-        movingMedian.add(16);
-        movingMedian.add(4);
-        movingMedian.add(10);
-        movingMedian.add(6);
-        movingMedian.add(17);
-        movingMedian.add(20);
-        movingMedian.add(1);
-        movingMedian.add(13);
+        movingMedian.add(0, 16);
+        movingMedian.add(1, 4);
+        movingMedian.add(2, 10);
+        movingMedian.add(3, 6);
+        movingMedian.add(4, 17);
+        movingMedian.add(5, 20);
+        movingMedian.add(6, 1);
+        movingMedian.add(7, 13);
 
         assertThat(movingMedian.median()).isCloseTo((10.0 + 13.0) / 2.0, PERCENTAGE);
 
         // 1, 4, 6, 10, 13, 16, 20
-        movingMedian.remove(17);
+        movingMedian.remove(4, 17);
         assertThat(movingMedian.median()).isCloseTo(10.0, PERCENTAGE);
 
         // 1, 4, 6, 13, 16, 20
-        movingMedian.remove(10);
+        movingMedian.remove(2, 10);
         assertThat(movingMedian.median()).isCloseTo((6.0 + 13.0) / 2.0, PERCENTAGE);
 
         // 1, 4, 6, 13, 16
-        movingMedian.remove(20);
+        movingMedian.remove(5, 20);
         assertThat(movingMedian.median()).isCloseTo(6.0, PERCENTAGE);
 
         // 4, 6, 13, 16
-        movingMedian.remove(1);
+        movingMedian.remove(6, 1);
         assertThat(movingMedian.median()).isCloseTo((6.0 + 13.0) / 2.0, PERCENTAGE);
 
         // 4, 13, 16
-        movingMedian.remove(6);
+        movingMedian.remove(3, 6);
         assertThat(movingMedian.median()).isCloseTo(13.0, PERCENTAGE);
 
         // 4, 16
-        movingMedian.remove(13);
+        movingMedian.remove(7, 13);
         assertThat(movingMedian.median()).isCloseTo((4.0 + 16.0) / 2.0, PERCENTAGE);
 
         // 4
-        movingMedian.remove(16);
+        movingMedian.remove(0, 16);
         assertThat(movingMedian.median()).isCloseTo(4.0, PERCENTAGE);
 
-        movingMedian.remove(4);
+        movingMedian.remove(1, 4);
     }
 
     @Test
@@ -89,14 +89,19 @@ public class SlidingWindowMedianTest {
         MovingMedian movingMedian = new MovingMedian(8);
 
         // 4
-        movingMedian.add(4);
+        movingMedian.add(0, 4);
         assertThat(movingMedian.median()).isCloseTo(4.0, PERCENTAGE);
 
-        movingMedian.remove(4);
+        movingMedian.remove(0, 4);
 
         assertThatThrownBy(movingMedian::median)
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("No elements available to calculate median");
+    }
+
+    @Test
+    void parentIdxCase1() {
+        assertThat(parentIdx(4)).isEqualTo(1);
     }
 
     @Test
@@ -124,7 +129,49 @@ public class SlidingWindowMedianTest {
     }
 
     @Test
-    void parentIdxCase1() {
-        assertThat(parentIdx(4)).isEqualTo(1);
+    void medianSlidingWindowCase5() {
+        assertThat(
+                        medianSlidingWindow(
+                                new int[] {
+                                    -2, -2, 2, -2, -2, -2, 2, 2, 2, 2, -2,
+                                },
+                                3))
+                .containsExactly(
+                        -2.00000, -2.00000, -2.00000, -2.00000, -2.00000, 2.00000, 2.00000, 2.00000,
+                        2.00000);
+    }
+
+    @Test
+    void medianSlidingWindowCase6() {
+        assertThat(
+                        medianSlidingWindow(
+                                new int[] {
+                                    -2147483648,
+                                    -2147483648,
+                                    2147483647,
+                                    -2147483648,
+                                    -2147483648,
+                                    -2147483648,
+                                    2147483647,
+                                    2147483647,
+                                    2147483647,
+                                    2147483647,
+                                    -2147483648,
+                                    2147483647,
+                                    -2147483648
+                                },
+                                3))
+                .containsExactly(
+                        -2147483648.00000,
+                        -2147483648.00000,
+                        -2147483648.00000,
+                        -2147483648.00000,
+                        -2147483648.00000,
+                        2147483647.00000,
+                        2147483647.00000,
+                        2147483647.00000,
+                        2147483647.00000,
+                        2147483647.00000,
+                        -2147483648.00000);
     }
 }
