@@ -45,6 +45,7 @@ public class PartitionArrayIntoTwoArraysToMinimizeSumDifference {
         private final Range[] ranges;
         private final int[] offsets;
 
+        @SuppressWarnings("unused")
         private int producedCombinations;
 
         public CombinationsSumIterator(int[] arr, int combinationSize) {

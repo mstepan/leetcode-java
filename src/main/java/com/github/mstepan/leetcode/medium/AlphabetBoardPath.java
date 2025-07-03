@@ -19,8 +19,6 @@ public class AlphabetBoardPath {
     public static String alphabetBoardPath(String target) {
         Objects.requireNonNull(target);
 
-        final int colsCount = 5;
-
         StringBuilder res = new StringBuilder();
 
         Cell last = charLocation('a');

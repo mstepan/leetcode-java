@@ -54,7 +54,9 @@ public class MinimumCostToSplitAnArray {
 
         final Map<Integer, Integer> freq = new HashMap<>();
 
+        @SuppressWarnings("unused")
         int k;
+
         int cost;
 
         public CostTracker(int k) {

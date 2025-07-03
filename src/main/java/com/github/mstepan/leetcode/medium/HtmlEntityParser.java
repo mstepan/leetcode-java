@@ -62,7 +62,10 @@ public class HtmlEntityParser {
 
     private static final class SpecialToken {
         final String symbol;
+
+        @SuppressWarnings("unused")
         final int from;
+
         final int to;
 
         SpecialToken(String symbol, int from, int to) {

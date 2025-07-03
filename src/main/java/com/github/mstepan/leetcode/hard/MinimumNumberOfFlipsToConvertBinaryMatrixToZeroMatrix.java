@@ -86,6 +86,7 @@ public class MinimumNumberOfFlipsToConvertBinaryMatrixToZeroMatrix {
         return -1;
     }
 
+    @SuppressWarnings("unused")
     private static void printMatrix(int[][] matrix) {
 
         StringBuilder buf = new StringBuilder();

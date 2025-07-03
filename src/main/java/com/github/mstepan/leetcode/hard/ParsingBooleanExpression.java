@@ -21,6 +21,7 @@ public class ParsingBooleanExpression {
         return rootNode.eval();
     }
 
+    @SuppressWarnings("all")
     private static ExpNode parse(Context ctx) {
 
         Token token = ctx.next();

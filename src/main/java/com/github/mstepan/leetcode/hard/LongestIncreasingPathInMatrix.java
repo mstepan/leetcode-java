@@ -72,6 +72,7 @@ public class LongestIncreasingPathInMatrix {
         return findMax(longestPath);
     }
 
+    @SuppressWarnings("unused")
     private static void printMatrix(int[][] m) {
         for (int[] curRow : m) {
             System.out.println(Arrays.toString(curRow));
