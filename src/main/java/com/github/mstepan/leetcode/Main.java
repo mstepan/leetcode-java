@@ -24,6 +24,8 @@ public class Main {
 
         invertInPlace(root);
 
+        System.out.printf("Java version: %s%n", System.getProperty("java.version"));
+
         System.out.println("Main done...");
     }
 

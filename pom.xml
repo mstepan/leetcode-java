@@ -12,7 +12,7 @@
 
         <assertj.version>3.15.0</assertj.version>
         <error.prone.core.version>2.3.2</error.prone.core.version>
-        <java.version>17</java.version>
+        <java.version>21</java.version>
         <lmax.disruptor.version>3.4.4</lmax.disruptor.version>
         <mockito-version>2.21.0</mockito-version>
         <surefire.plugin.version>3.0.0-M4</surefire.plugin.version>
