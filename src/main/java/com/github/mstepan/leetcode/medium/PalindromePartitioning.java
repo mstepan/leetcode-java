@@ -38,6 +38,7 @@ public class PalindromePartitioning {
 
         char[] arr = str.toCharArray();
 
+        @SuppressWarnings("unchecked")
         List<StringPartition>[] allPartitions = new List[arr.length];
 
         for (int to = 0; to < arr.length; ++to) {

@@ -310,6 +310,7 @@ public class ZumaGame {
     private static final char FIRST_CH = 'A';
     private static final char LAST_CH = 'E';
 
+    @SuppressWarnings("unused")
     private static boolean isColorChar(char ch) {
         return ch >= FIRST_CH && ch <= LAST_CH;
     }

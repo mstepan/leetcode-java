@@ -21,6 +21,7 @@ public class SimplifyPath {
         System.out.println("SimplifyPath done...");
     }
 
+    @SuppressWarnings("all")
     /** time: O(N) space: O(N) */
     public String simplifyPath(String path) {
         Objects.requireNonNull(path);

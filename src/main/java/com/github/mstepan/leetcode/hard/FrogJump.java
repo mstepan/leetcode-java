@@ -38,6 +38,7 @@ public class FrogJump {
             return false;
         }
 
+        @SuppressWarnings("unchecked")
         Set<Integer>[] solutions = new Set[stones.length];
         solutions[0] = Set.of(0);
         solutions[1] = Set.of(1);
