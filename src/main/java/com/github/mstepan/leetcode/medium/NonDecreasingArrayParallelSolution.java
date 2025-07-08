@@ -29,9 +29,7 @@ public class NonDecreasingArrayParallelSolution {
     }
 
     public boolean checkPossibility(int[] arr) {
-        ForkJoinPool pool = new ForkJoinPool();
-
-        try {
+        try (ForkJoinPool pool = new ForkJoinPool()) {
             PartialResult result =
                     pool.submit(new CheckPossibilityRecTask(arr, 0, arr.length - 1)).get();
             return result.possible();
@@ -40,8 +38,6 @@ public class NonDecreasingArrayParallelSolution {
         } catch (InterruptedException interEx) {
             Thread.currentThread().interrupt();
             return true;
-        } finally {
-            pool.shutdownNow();
         }
     }
 
@@ -62,7 +58,7 @@ public class NonDecreasingArrayParallelSolution {
 
             System.out.printf(
                     "thread-id: %d => range: [%d...%d] %n",
-                    Thread.currentThread().getId(), from, to);
+                    Thread.currentThread().threadId(), from, to);
 
             int elemsCnt = to - from + 1;
 

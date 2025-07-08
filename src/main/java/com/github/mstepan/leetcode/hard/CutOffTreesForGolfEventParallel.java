@@ -35,16 +35,13 @@ public class CutOffTreesForGolfEventParallel {
         cellsWithTree.sort(CutOffTreesForGolfEvent.Cell.HEIGHT_ASC);
         cellsWithTree.add(0, new CutOffTreesForGolfEvent.Cell(m[0][0], 0, 0));
 
-        ForkJoinPool pool = new ForkJoinPool();
-        try {
+        try (ForkJoinPool pool = new ForkJoinPool()) {
             int stepsCnt =
                     pool.invoke(
                             new ShortestPathLengthCalculatorTask(
                                     m, cellsWithTree, 0, cellsWithTree.size() - 1));
 
             return stepsCnt == Integer.MAX_VALUE ? -1 : stepsCnt;
-        } finally {
-            pool.shutdownNow();
         }
     }
 

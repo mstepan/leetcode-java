@@ -13,22 +13,21 @@ public class CollatzConjectureMain {
         final int startOfRange = 2;
         final int endOfRange = Integer.MAX_VALUE;
 
-        ForkJoinPool pool = new ForkJoinPool();
+        try (ForkJoinPool pool = new ForkJoinPool()) {
 
-        long startTime = System.nanoTime();
+            long startTime = System.nanoTime();
 
-        boolean res = pool.submit(new ConjectureCheckerTask(startOfRange, endOfRange)).get();
+            boolean res = pool.submit(new ConjectureCheckerTask(startOfRange, endOfRange)).get();
 
-        long endTime = System.nanoTime();
+            long endTime = System.nanoTime();
 
-        pool.shutdownNow();
+            System.out.printf(
+                    "Collatz Conjecture is %b for range [%d..%d]%n", res, startOfRange, endOfRange);
 
-        System.out.printf(
-                "Collatz Conjecture is %b for range [%d..%d]%n", res, startOfRange, endOfRange);
+            Duration elapsedTimeInNanos = Duration.of(endTime - startTime, ChronoUnit.NANOS);
 
-        Duration elapsedTimeInNanos = Duration.of(endTime - startTime, ChronoUnit.NANOS);
-
-        System.out.printf("time: %d ms%n", TimeUnit.MILLISECONDS.convert(elapsedTimeInNanos));
+            System.out.printf("time: %d ms%n", TimeUnit.MILLISECONDS.convert(elapsedTimeInNanos));
+        }
 
         System.out.println("CollatzConjectureMain done...");
     }
