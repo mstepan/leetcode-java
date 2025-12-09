@@ -9,7 +9,7 @@ public class Subsets2Test {
 
     @Test
     void case1() {
-        assertThat(Subsets2.subsetsWithDup(new int[] {1, 2, 2}))
+        assertThat(Subsets2.subsetsWithDupParallel(new int[] {1, 2, 2}))
                 .containsExactlyInAnyOrder(
                         List.of(),
                         List.of(1),
@@ -21,13 +21,13 @@ public class Subsets2Test {
 
     @Test
     void case2() {
-        assertThat(Subsets2.subsetsWithDup(new int[] {0}))
+        assertThat(Subsets2.subsetsWithDupParallel(new int[] {0}))
                 .containsExactlyInAnyOrder(List.of(), List.of(0));
     }
 
     @Test
     void case3() {
-        assertThat(Subsets2.subsetsWithDup(new int[] {4, 4, 4, 1, 4}))
+        assertThat(Subsets2.subsetsWithDupParallel(new int[] {4, 4, 4, 1, 4}))
                 .containsExactlyInAnyOrder(
                         List.of(),
                         List.of(1),
@@ -43,6 +43,7 @@ public class Subsets2Test {
 
     @Test
     void caseWithEmptyArray() {
-        assertThat(Subsets2.subsetsWithDup(new int[] {})).containsExactlyInAnyOrder(List.of());
+        assertThat(Subsets2.subsetsWithDupParallel(new int[] {}))
+                .containsExactlyInAnyOrder(List.of());
     }
 }
