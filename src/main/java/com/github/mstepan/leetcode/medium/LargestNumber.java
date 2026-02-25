@@ -1,7 +1,6 @@
 package com.github.mstepan.leetcode.medium;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Objects;
 
 /**
@@ -11,51 +10,21 @@ import java.util.Objects;
  */
 public class LargestNumber {
 
-    private static final Comparator<String> ALPHABETIC_STR_SPECIAL_ASC =
-            (first, second) -> {
-                String firstSecond = first + second;
-                String secondFirst = second + first;
-
-                return firstSecond.compareTo(secondFirst);
-            };
-
-    private static final Comparator<String> ALPHABETIC_STR_SPECIAL_DESC =
-            ALPHABETIC_STR_SPECIAL_ASC.reversed();
-
     public static String largestNumber(int[] nums) {
-        Objects.requireNonNull(nums, "nums cannot be null");
-
-        String[] numsStr = toStringArray(nums);
-
-        Arrays.sort(numsStr, ALPHABETIC_STR_SPECIAL_DESC);
-
-        return concatenateSkippingLeadingZeros(numsStr);
-    }
-
-    private static String[] toStringArray(int[] nums) {
-        assert nums != null;
-        String[] arr = new String[nums.length];
-
-        for (int i = 0; i < nums.length; i++) {
-            arr[i] = String.valueOf(nums[i]);
-        }
-        return arr;
-    }
-
-    private static String concatenateSkippingLeadingZeros(String[] numsStr) {
-        assert numsStr != null;
-        StringBuilder res = new StringBuilder(numsStr.length * 5); // 1000000
-
-        for (String valueAsStr : numsStr) {
-            if (res.isEmpty() && valueAsStr.equals("0")) {
-                continue;
-            }
-            res.append(valueAsStr);
+        if (Objects.isNull(nums) || nums.length == 0) {
+            throw new IllegalArgumentException("'nums' is null or empty");
         }
 
-        if (res.isEmpty()) {
+        String[] numbersAsStrings =
+                Arrays.stream(nums).mapToObj(String::valueOf).toArray(String[]::new);
+
+        Arrays.sort(
+                numbersAsStrings, (first, second) -> (second + first).compareTo(first + second));
+
+        if (numbersAsStrings.length == 0 || "0".equals(numbersAsStrings[0])) {
             return "0";
         }
-        return res.toString();
+
+        return String.join("", numbersAsStrings);
     }
 }
