@@ -1,13 +1,14 @@
 package com.github.mstepan.leetcode;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
 public class BookmapTest {
 
     @Test
-    void normalCase1() {
+    void exampleCase1() {
         int[] answers =
                 Bookmap.findAnswerForQueries(
                         "ABBABAAB",
@@ -19,7 +20,7 @@ public class BookmapTest {
     }
 
     @Test
-    void normalCase2() {
+    void exampleCase2() {
         int[] answers =
                 Bookmap.findAnswerForQueries(
                         "ABBABAAB",
@@ -31,7 +32,7 @@ public class BookmapTest {
     }
 
     @Test
-    void normalCase3() {
+    void exampleCase3() {
         int[] answers =
                 Bookmap.findAnswerForQueries(
                         "ABBABAAB",
@@ -102,5 +103,99 @@ public class BookmapTest {
                         });
 
         assertArrayEquals(new int[] {4, 1, -1}, answers);
+    }
+
+    @Test
+    void alternatingStringCoversAllKPositions() {
+        int[] answers =
+                Bookmap.findAnswerForQueries(
+                        "ABABAB",
+                        new Bookmap.Query[] {
+                            new Bookmap.Query(1, 6, 1),
+                            new Bookmap.Query(1, 6, 2),
+                            new Bookmap.Query(1, 6, 3),
+                            new Bookmap.Query(1, 6, 4),
+                            new Bookmap.Query(1, 6, 5),
+                            new Bookmap.Query(1, 6, 6),
+                        });
+
+        assertArrayEquals(new int[] {2, 1, 4, 3, 6, 5}, answers);
+    }
+
+    @Test
+    void queryWithKAtSubrangeBoundaries() {
+        int[] answers =
+                Bookmap.findAnswerForQueries(
+                        "BAABABB",
+                        new Bookmap.Query[] {
+                            new Bookmap.Query(2, 7, 1), new Bookmap.Query(2, 7, 6),
+                        });
+
+        assertArrayEquals(new int[] {3, 4}, answers);
+    }
+
+    @Test
+    void returnsMinusOneWhenExpectedOppositeCharacterCountNotPresent() {
+        int[] answers =
+                Bookmap.findAnswerForQueries(
+                        "AABAAA",
+                        new Bookmap.Query[] {
+                            new Bookmap.Query(1, 6, 6), new Bookmap.Query(2, 6, 4),
+                        });
+
+        assertArrayEquals(new int[] {-1, -1}, answers);
+    }
+
+    @Test
+    void emptyQueriesReturnsEmptyAnswers() {
+        int[] answers = Bookmap.findAnswerForQueries("ABBABAAB", new Bookmap.Query[0]);
+
+        assertArrayEquals(new int[0], answers);
+    }
+
+    @Test
+    void throwsForNullString() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () ->
+                        Bookmap.findAnswerForQueries(
+                                null, new Bookmap.Query[] {new Bookmap.Query(1, 1, 1)}));
+    }
+
+    @Test
+    void throwsForNullQueriesArray() {
+        assertThrows(
+                IllegalArgumentException.class, () -> Bookmap.findAnswerForQueries("AB", null));
+    }
+
+    @Test
+    void throwsForInvalidCharactersInString() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () ->
+                        Bookmap.findAnswerForQueries(
+                                "ABC",
+                                new Bookmap.Query[] {
+                                    new Bookmap.Query(1, 3, 1),
+                                }));
+    }
+
+    @Test
+    void throwsWhenQueryIsOutsideStringRange() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () ->
+                        Bookmap.findAnswerForQueries(
+                                "ABAB",
+                                new Bookmap.Query[] {
+                                    new Bookmap.Query(1, 5, 1),
+                                }));
+    }
+
+    @Test
+    void queryConstructorValidationRejectsInvalidArguments() {
+        assertThrows(IllegalArgumentException.class, () -> new Bookmap.Query(0, 1, 1));
+        assertThrows(IllegalArgumentException.class, () -> new Bookmap.Query(2, 1, 1));
+        assertThrows(IllegalArgumentException.class, () -> new Bookmap.Query(1, 3, 4));
     }
 }
