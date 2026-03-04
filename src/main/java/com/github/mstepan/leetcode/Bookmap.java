@@ -47,55 +47,57 @@ public class Bookmap {
         public int findKthCharacter(
                 char searchCh, int expectedCounter, char[] chars, int[] prefixSum) {
 
-            // time: O(N), space: O(1)
-            // TODO: We can use binary-search the answer idea here with prefix sum to quickly search
-            // the range [left....right]
-            // TODO: time: O(lgN), space: O(1)
-
             int from = leftIdxInStr();
+            final int initialFrom = from;
             int to = rightIdxInStr();
 
-            int maxCounterValue = prefixSum[to] - (from == 0 ? 0 : prefixSum[from - 1]);
+            int maxPossibleCounter = prefixSum[to] - (from == 0 ? 0 : prefixSum[from - 1]);
 
             // short circuit early if the maximum possible number of occurrences for 'searchCh' is
             // less than 'expectedCounter'
-            if (maxCounterValue < expectedCounter) {
+            if (maxPossibleCounter < expectedCounter) {
                 return -1;
             }
 
-            //            while (from <= to) {
-            //                final int mid = from + (to - from) / 2;
-            //                final int curCounter = prefixSum[mid] - (from == 0 ? 0 :
-            // prefixSum[from - 1]);
-            //
-            //                if (curCounter < expectedCounter) {
-            //                    // search to the right
-            //                    from = mid + 1;
-            //                } else if (curCounter > expectedCounter) {
-            //                    // search to the left
-            //                    to = mid - 1;
-            //                } else {
-            //                    if (chars[mid] == searchCh) {
-            //                        // result found
-            //                        return mid - from + 2;
-            //                    } else {
-            //                        // search to the left
-            //                        to = mid - 1;
-            //                    }
-            //                }
-            //            }
+            // binary search the answer, time: O(lgN)
+            // We can use binary-search the answer idea here with prefix sum.
+            while (from <= to) {
+                final int mid = from + (to - from) / 2;
+                final int curCounter =
+                        prefixSum[mid] - (initialFrom == 0 ? 0 : prefixSum[initialFrom - 1]);
 
-            int actualCounter = 0;
-
-            for (int i = leftIdxInStr(), offset = 1; i <= rightIdxInStr(); ++i, ++offset) {
-                if (chars[i] == searchCh) {
-                    ++actualCounter;
-                }
-
-                if (actualCounter == expectedCounter) {
-                    return offset;
+                if (curCounter < expectedCounter) {
+                    // search to the right
+                    from = mid + 1;
+                } else if (curCounter > expectedCounter) {
+                    // search to the left
+                    to = mid - 1;
+                } else {
+                    if (chars[mid] == searchCh) {
+                        // result found
+                        return mid - initialFrom + 1;
+                    } else {
+                        // IMPORTANT: search to the left using binary search,
+                        // if we will use linear search from 'mid' position to the left, this cab be
+                        // time: O(N)
+                        to = mid - 1;
+                    }
                 }
             }
+
+            // linear search, time: O(N)
+            //            int actualCounter = 0;
+            //
+            //            for (int i = leftIdxInStr(), offset = 1; i <= rightIdxInStr(); ++i,
+            // ++offset) {
+            //                if (chars[i] == searchCh) {
+            //                    ++actualCounter;
+            //                }
+            //
+            //                if (actualCounter == expectedCounter) {
+            //                    return offset;
+            //                }
+            //            }
 
             return -1;
         }
@@ -114,6 +116,8 @@ public class Bookmap {
      * N = str.length()
      *
      * <p>M = queries.length
+     *
+     * <p>Time: (M*lgN), Space: O(N)
      */
     public static int[] findAnswerForQueries(String str, Query[] queries) {
         checkPrecondition(() -> str != null, "null 'str' detected");
@@ -145,7 +149,7 @@ public class Bookmap {
 
         final int[] answers = new int[queries.length];
 
-        // time: O(M*N), but can be reduced to O(M*lgN)
+        // time: O(M*lgN)
         for (int i = 0; i < queries.length; i++) {
             final Query query = queries[i];
 
@@ -154,11 +158,10 @@ public class Bookmap {
             // time: O(1)
             int x = calculateX(chars, query, aPrefixSum, bPrefixSum);
 
-            // time: O(N) => O(lgN)
-
             char charToSearch = chars[query.kIndexInStr()] == A ? B : A;
             int[] prefixSum = chars[query.kIndexInStr()] == A ? bPrefixSum : aPrefixSum;
 
+            // time: O(lgN)
             answers[i] = query.findKthCharacter(charToSearch, x, chars, prefixSum);
         }
 
