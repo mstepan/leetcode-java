@@ -2,6 +2,8 @@ package com.github.mstepan.leetcode.hard;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class ErectTheFenceTest {
@@ -11,13 +13,8 @@ public class ErectTheFenceTest {
         int[][] actualRes =
                 ErectTheFence.outerTrees(new int[][] {{3, 3}, {5, 3}, {7, 3}, {10, 3}, {12, 3}});
 
-        assertThat(actualRes)
-                .containsExactlyInAnyOrder(
-                        new int[] {3, 3},
-                        new int[] {5, 3},
-                        new int[] {7, 3},
-                        new int[] {10, 3},
-                        new int[] {12, 3});
+        assertPointsExactlyInAnyOrder(
+                actualRes, new int[][] {{3, 3}, {5, 3}, {7, 3}, {10, 3}, {12, 3}});
     }
 
     @Test
@@ -26,22 +23,15 @@ public class ErectTheFenceTest {
                 ErectTheFence.outerTrees(
                         new int[][] {{1, 1}, {2, 2}, {2, 0}, {2, 4}, {3, 3}, {4, 2}});
 
-        assertThat(actualRes)
-                .containsExactlyInAnyOrder(
-                        new int[] {1, 1},
-                        new int[] {2, 0},
-                        new int[] {4, 2},
-                        new int[] {3, 3},
-                        new int[] {2, 4});
+        assertPointsExactlyInAnyOrder(
+                actualRes, new int[][] {{1, 1}, {2, 0}, {4, 2}, {3, 3}, {2, 4}});
     }
 
     @Test
     void outerTreesCase2() {
         int[][] actualRes = ErectTheFence.outerTrees(new int[][] {{1, 2}, {2, 2}, {4, 2}});
 
-        assertThat(actualRes)
-                .hasSize(3)
-                .containsExactlyInAnyOrder(new int[] {1, 2}, new int[] {2, 2}, new int[] {4, 2});
+        assertPointsExactlyInAnyOrder(actualRes, new int[][] {{1, 2}, {2, 2}, {4, 2}});
     }
 
     @Test
@@ -53,24 +43,14 @@ public class ErectTheFenceTest {
                             {4, 5}, {3, 5}, {2, 5}, {1, 4}, {1, 3}, {1, 2}, {2, 1}, {4, 2}, {0, 3}
                         });
 
-        assertThat(actualRes)
-                .containsExactlyInAnyOrder(
-                        new int[] {4, 5},
-                        new int[] {2, 5},
-                        new int[] {6, 1},
-                        new int[] {3, 5},
-                        new int[] {2, 1},
-                        new int[] {1, 4},
-                        new int[] {1, 2},
-                        new int[] {7, 4},
-                        new int[] {7, 3},
-                        new int[] {7, 2},
-                        new int[] {3, 0},
-                        new int[] {0, 3},
-                        new int[] {5, 0},
-                        new int[] {5, 5},
-                        new int[] {4, 0},
-                        new int[] {6, 5});
+        assertPointsExactlyInAnyOrder(
+                actualRes,
+                new int[][] {
+                    {4, 5}, {2, 5}, {6, 1}, {3, 5},
+                    {2, 1}, {1, 4}, {1, 2}, {7, 4},
+                    {7, 3}, {7, 2}, {3, 0}, {0, 3},
+                    {5, 0}, {5, 5}, {4, 0}, {6, 5}
+                });
     }
 
     @Test
@@ -79,12 +59,16 @@ public class ErectTheFenceTest {
                 ErectTheFence.outerTrees(
                         new int[][] {{0, 2}, {1, 1}, {2, 2}, {2, 4}, {4, 2}, {3, 3}});
 
-        assertThat(actualRes)
-                .containsExactlyInAnyOrder(
-                        new int[] {0, 2},
-                        new int[] {4, 2},
-                        new int[] {3, 3},
-                        new int[] {1, 1},
-                        new int[] {2, 4});
+        assertPointsExactlyInAnyOrder(
+                actualRes, new int[][] {{0, 2}, {4, 2}, {3, 3}, {1, 1}, {2, 4}});
+    }
+
+    private static void assertPointsExactlyInAnyOrder(int[][] actual, int[][] expected) {
+        assertThat(actual.length).isEqualTo(expected.length);
+        assertThat(toSortedPoints(actual)).containsExactlyElementsOf(toSortedPoints(expected));
+    }
+
+    private static List<String> toSortedPoints(int[][] points) {
+        return Arrays.stream(points).map(point -> point[0] + "," + point[1]).sorted().toList();
     }
 }
