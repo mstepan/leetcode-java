@@ -1,6 +1,6 @@
 package com.github.mstepan.leetcode.medium;
 
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * 1718. Construct the Lexicographically Largest Valid Sequence
@@ -12,64 +12,66 @@ public class ConstructLexicographicallyLargestValidSequence {
     public static int[] constructDistancedSequence(int n) {
         checkInRange(n, 1, 20);
 
-        final int expectedSolLength = n * 2 - 1;
-        final BestSequence best = new BestSequence(new int[expectedSolLength]);
+        final List<int[]> best = new ArrayList<>();
+        tryPlaceBest(new int[n * 2 - 1], 0, new HashSet<>(), n, best);
 
-        tryPlaceBest(new int[expectedSolLength], n, best);
-
-        return best.sol;
+        return best.getFirst();
     }
 
-    private static void tryPlaceBest(int[] sol, int val, BestSequence best) {
-        if (val == 1) {
-            int emptySlotIdx = findEmptySlot(sol);
-            assert emptySlotIdx != -1;
+    private static void tryPlaceBest(
+            int[] solution, int idx, Set<Integer> alreadyPlaced, int elemsCount, List<int[]> best) {
 
-            sol[emptySlotIdx] = 1;
-
-            best.recordBestSolution(sol);
-
-            sol[emptySlotIdx] = 0;
-
+        if (alreadyPlaced.size() == elemsCount) {
+            best.add(Arrays.copyOf(solution, solution.length));
             return;
         }
 
-        for (int i = 0; i < sol.length && i + val < sol.length; i++) {
-            if (sol[i] == 0 && sol[i + val] == 0) {
-                sol[i] = val;
-                sol[i + val] = val;
+        for (int value = elemsCount; value >= 1 && best.isEmpty(); --value) {
 
-                tryPlaceBest(sol, val - 1, best);
+            if (!alreadyPlaced.contains(value)) {
 
-                sol[i] = 0;
-                sol[i + val] = 0;
+                if (value == 1) {
+                    solution[idx] = 1;
+                    alreadyPlaced.add(1);
+
+                    tryPlaceBest(
+                            solution,
+                            findEmptySlotFrom(idx + 1, solution),
+                            alreadyPlaced,
+                            elemsCount,
+                            best);
+
+                    alreadyPlaced.remove(1);
+                    solution[idx] = 0;
+                } else {
+                    if (idx + value < solution.length && solution[idx + value] == 0) {
+                        solution[idx] = value;
+                        solution[idx + value] = value;
+                        alreadyPlaced.add(value);
+
+                        tryPlaceBest(
+                                solution,
+                                findEmptySlotFrom(idx, solution),
+                                alreadyPlaced,
+                                elemsCount,
+                                best);
+
+                        alreadyPlaced.remove(value);
+                        solution[idx + value] = 0;
+                        solution[idx] = 0;
+                    }
+                }
             }
         }
     }
 
-    private static int findEmptySlot(int[] sol) {
-        for (int i = 0; i < sol.length; i++) {
+    private static int findEmptySlotFrom(int from, int[] sol) {
+        for (int i = from; i < sol.length; i++) {
             if (sol[i] == 0) {
                 return i;
             }
         }
         return -1;
-    }
-
-    static class BestSequence {
-        final int[] sol;
-
-        public BestSequence(int[] sol) {
-            this.sol = sol;
-        }
-
-        public void recordBestSolution(int[] curSolution) {
-            int cmpRes = Arrays.compare(curSolution, this.sol);
-
-            if (cmpRes > 0) {
-                System.arraycopy(curSolution, 0, this.sol, 0, curSolution.length);
-            }
-        }
     }
 
     private static void checkInRange(int value, int from, int to) {
