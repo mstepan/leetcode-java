@@ -10,12 +10,13 @@ import java.util.Objects;
 public class MinimumAsciiDeleteSumForTwoStrings {
 
     /**
-     * Solved using top-down dynamic programming approach.
-     * time: O(N*K), space: O(N*K) ~ O(min(N, K))
+     * Solved using bottom-up dynamic programming approach.
      *
-     * N = s1.length()
-     * K = s2.length()
+     * <p>time: O(N*K)
      *
+     * <p>space: O(N*K) but can be reduced to O(min(N,K))
+     *
+     * <p>N = s1.length(), K = s2.length()
      */
     public static int minimumDeleteSum(String s1, String s2) {
         Objects.requireNonNull(s1);
