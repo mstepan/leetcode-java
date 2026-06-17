@@ -1,7 +1,6 @@
 package com.github.mstepan.leetcode.medium;
 
 import static com.github.mstepan.leetcode.medium.MinimumAsciiDeleteSumForTwoStrings.minimumDeleteSum;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
