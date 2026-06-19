@@ -1,8 +1,6 @@
 package com.github.mstepan.leetcode.hard;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 1163. Last Substring in Lexicographical Order
@@ -12,7 +10,7 @@ import java.util.Objects;
 public class LastSubstringInLexicographicalOrder {
 
     /**
-     * time: O(N*lgN*K)
+     * time: O(N)
      *
      * <p>space: O(N)
      */
@@ -23,54 +21,112 @@ public class LastSubstringInLexicographicalOrder {
             return str;
         }
 
-        Suffix[] allSuffixes = new Suffix[str.length()];
+        Set<Integer> maxCharSuffixesIndexes = findMaxCharOffsets(str);
 
-        for (int i = 0; i < str.length(); ++i) {
-            allSuffixes[i] = new Suffix(i, str);
+        List<Suffix> curLevel = Suffix.suffixesFromStartIndexes(maxCharSuffixesIndexes, str);
+
+        while (curLevel.size() > 1) {
+            final Set<Integer> skipNext = new HashSet<>();
+
+            final List<Suffix> nextLevel = new ArrayList<>();
+            char maxCh = Character.MIN_VALUE;
+
+            for (Suffix singleSuffix : curLevel) {
+                if (skipNext.contains(singleSuffix.from)) {
+                    continue;
+                }
+
+                final char curCh = singleSuffix.curChar();
+                final int curIdx = singleSuffix.idx;
+
+                singleSuffix.moveNextChar();
+
+                if (curCh >= maxCh) {
+
+                    if (curCh > maxCh) {
+                        nextLevel.clear();
+                        maxCh = curCh;
+                    }
+
+                    nextLevel.add(singleSuffix);
+
+                    // check if we hit another suffix that need to be skipped from processing next
+                    if (maxCharSuffixesIndexes.contains(curIdx)) {
+                        skipNext.add(curIdx);
+                    }
+                }
+            }
+
+            curLevel = nextLevel;
         }
 
-        Arrays.sort(allSuffixes, Suffix.SUFFIX_STR_ASC);
-
-        return allSuffixes[allSuffixes.length - 1].suffixStr();
+        return curLevel.getFirst().suffixStr();
     }
 
-    record Suffix(int from, String baseStr) {
+    private static Set<Integer> findMaxCharOffsets(String str) {
+        assert str != null;
+        Set<Integer> maxCharSuffixesIndexes = new HashSet<>(str.length());
+        char maxCh = Character.MIN_VALUE;
 
-        @SuppressWarnings("StringEquality")
-        private static final Comparator<Suffix> SUFFIX_STR_ASC =
-                (first, second) -> {
-                    assert first.baseStr() == second.baseStr();
+        for (int i = 0; i < str.length(); ++i) {
+            char ch = str.charAt(i);
 
-                    final String str = first.baseStr();
-                    int firstIdx = first.from();
-                    int secondIdx = second.from();
+            if (ch == maxCh) {
+                maxCharSuffixesIndexes.add(i);
+            } else if (ch > maxCh) {
+                maxCharSuffixesIndexes.clear();
+                maxCharSuffixesIndexes.add(i);
 
-                    while (firstIdx < str.length() && secondIdx < str.length()) {
+                maxCh = ch;
+            }
+        }
 
-                        char firstCh = str.charAt(firstIdx);
-                        char secondCh = str.charAt(secondIdx);
+        return maxCharSuffixesIndexes;
+    }
 
-                        int cmp = Character.compare(firstCh, secondCh);
+    private static class Suffix {
 
-                        if (cmp != 0) {
-                            return cmp;
-                        }
+        final int from;
+        final String baseStr;
+        int idx;
 
-                        ++firstIdx;
-                        ++secondIdx;
-                    }
+        public Suffix(int from, String baseStr) {
+            this.from = from;
+            this.baseStr = baseStr;
+            this.idx = from;
+        }
 
-                    if (firstIdx < str.length()) {
-                        return 1;
-                    } else if (secondIdx < str.length()) {
-                        return -1;
-                    }
+        public static List<Suffix> suffixesFromStartIndexes(
+                Set<Integer> maxCharSuffixesIndexes, String baseStr) {
 
-                    return 0;
-                };
+            List<Suffix> result = new ArrayList<>(maxCharSuffixesIndexes.size());
+
+            for (int singleOffset : maxCharSuffixesIndexes) {
+                result.add(new Suffix(singleOffset, baseStr));
+            }
+
+            return result;
+        }
 
         public String suffixStr() {
             return baseStr.substring(from);
+        }
+
+        public char curChar() {
+            if (idx >= baseStr.length()) {
+                return Character.MIN_VALUE;
+            }
+
+            return baseStr.charAt(idx);
+        }
+
+        @Override
+        public String toString() {
+            return suffixStr();
+        }
+
+        public void moveNextChar() {
+            ++idx;
         }
     }
 }
