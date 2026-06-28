@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 public class FindTheGridOfRegionAverageTest {
 
     @Test
-    void case1() {
+    void shouldReplaceWholeGridWhenSingleValidRegionCoversAllPixels() {
         int[][] actual =
                 resultGrid(
                         new int[][] {
@@ -28,7 +28,7 @@ public class FindTheGridOfRegionAverageTest {
     }
 
     @Test
-    void case2() {
+    void shouldAverageOverlappingVerticalRegionsForSharedPixels() {
         int[][] actual =
                 resultGrid(
                         new int[][] {
@@ -45,6 +45,66 @@ public class FindTheGridOfRegionAverageTest {
                     {27, 27, 27},
                     {27, 27, 27},
                     {30, 30, 30}
+                },
+                actual);
+    }
+
+    @Test
+    void shouldKeepOriginalGridWhenNoRegionSatisfiesThreshold() {
+        int[][] actual =
+                resultGrid(
+                        new int[][] {
+                            {1, 1, 1},
+                            {1, 9, 1},
+                            {1, 1, 1}
+                        },
+                        0);
+
+        assertArrayEquals(
+                new int[][] {
+                    {1, 1, 1},
+                    {1, 9, 1},
+                    {1, 1, 1}
+                },
+                actual);
+    }
+
+    @Test
+    void shouldTreatAdjacentDifferenceEqualToThresholdAsValidRegion() {
+        int[][] actual =
+                resultGrid(
+                        new int[][] {
+                            {1, 3, 5},
+                            {3, 5, 7},
+                            {5, 7, 9}
+                        },
+                        2);
+
+        assertArrayEquals(
+                new int[][] {
+                    {5, 5, 5},
+                    {5, 5, 5},
+                    {5, 5, 5}
+                },
+                actual);
+    }
+
+    @Test
+    void shouldRoundDownAverageOfMultipleOverlappingRegionAverages() {
+        int[][] actual =
+                resultGrid(
+                        new int[][] {
+                            {0, 0, 0, 9},
+                            {0, 0, 0, 9},
+                            {0, 0, 0, 9}
+                        },
+                        9);
+
+        assertArrayEquals(
+                new int[][] {
+                    {0, 1, 1, 3},
+                    {0, 1, 1, 3},
+                    {0, 1, 1, 3}
                 },
                 actual);
     }
