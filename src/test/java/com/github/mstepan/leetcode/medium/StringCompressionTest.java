@@ -9,10 +9,34 @@ public class StringCompressionTest {
     @Test
     void normalCases() {
         assertCompressed("aabbccc", "a2b2c3");
-
-        assertCompressed("a", "a");
-
         assertCompressed("abbbbbbbbbbbb", "ab12");
+    }
+
+    @Test
+    void oneCharString() {
+        assertCompressed("a", "a");
+    }
+
+    @Test
+    void emptyString() {
+        assertCompressed("", "");
+    }
+
+    @Test
+    void distinctCharactersRemainUnchanged() {
+        assertCompressed("abcdef", "abcdef");
+    }
+
+    @Test
+    void alternatingAndRepeatedGroups() {
+        assertCompressed("abbccccdde", "ab2c4d2e");
+        assertCompressed("aaabccdddd", "a3bc2d4");
+    }
+
+    @Test
+    void multiDigitCounts() {
+        assertCompressed("aaaaaaaaaa", "a10");
+        assertCompressed("b".repeat(100), "b100");
     }
 
     private static void assertCompressed(String initialStr, String compressed) {
