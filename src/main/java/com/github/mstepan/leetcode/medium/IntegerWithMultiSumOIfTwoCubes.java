@@ -1,18 +1,15 @@
 package com.github.mstepan.leetcode.medium;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
- * 3890. Integers with multiple sum of two cubes.
+ * 3890. Integers With Multiple Sum of Two Cubes
  *
- * <p>https://leetcode.com/problems/...
+ * <p>https://leetcode.com/problems/integers-with-multiple-sum-of-two-cubes/description/
  */
 public class IntegerWithMultiSumOIfTwoCubes {
 
-    private static final int[] CUBES = new int[1000];
+    private static final int[] CUBES = new int[1001];
 
     static {
         for (int i = 1; i < CUBES.length; ++i) {
@@ -20,17 +17,21 @@ public class IntegerWithMultiSumOIfTwoCubes {
         }
     }
 
-    public static int[] findGoodNumbers(int n) {
+    public static List<Integer> findGoodIntegers(int n) {
+
         if (n <= 0) {
             throw new IllegalArgumentException("n should be greater than 0, n: " + n);
         }
 
-        List<Integer> results = new ArrayList<>();
-        Set<Integer> candidates = new HashSet<>();
+        // store candidates inside Map so we don't have duplicates when:
+        // a^3 + b^3 == c^3 + d^3 == e^3 + f^3
+        Map<Integer, Integer> candidates = new HashMap<>();
+
+        List<Integer> goodNumbers = new ArrayList<>();
 
         MAIN:
         for (int i = 1; i < CUBES.length; ++i) {
-            for (int j = i + 1; j < CUBES.length; ++j) {
+            for (int j = i; j < CUBES.length; ++j) {
 
                 final int cur = CUBES[i] + CUBES[j];
 
@@ -38,28 +39,18 @@ public class IntegerWithMultiSumOIfTwoCubes {
                     continue MAIN;
                 }
 
-                boolean wasNew = candidates.add(cur);
+                int totalCnt =
+                        candidates.compute(cur, (notUsedKey, cnt) -> cnt == null ? 1 : cnt + 1);
 
-                if (!wasNew) {
-                    results.add(cur);
+                if (totalCnt == 2) {
+                    goodNumbers.add(cur);
                 }
             }
         }
 
-        return toPrimitiveIntArray(results);
-    }
+        // sort number is ASC order according to requirements
+        goodNumbers.sort(Integer::compare);
 
-    private static int[] toPrimitiveIntArray(List<Integer> results) {
-        assert results != null;
-
-        int[] arr = new int[results.size()];
-
-        int i = 0;
-        for (int val : results) {
-            arr[i] = val;
-            ++i;
-        }
-
-        return arr;
+        return goodNumbers;
     }
 }
