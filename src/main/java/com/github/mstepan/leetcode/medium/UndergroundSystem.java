@@ -1,18 +1,21 @@
 package com.github.mstepan.leetcode.medium;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 1396. Design Underground System
  *
  * <p>https://leetcode.com/problems/design-underground-system/description/
+ *
+ * <p>Also fully thread safe and non-blocking.
  */
 public class UndergroundSystem {
 
-    private final Map<Integer, CheckInEvent> inProgressTrips = new HashMap<>();
+    private final ConcurrentMap<Integer, CheckInEvent> inProgressTrips = new ConcurrentHashMap<>();
 
-    private final Map<String, TripStat> tripsStatistic = new HashMap<>();
+    private final ConcurrentMap<String, TripStat> tripsStatistic = new ConcurrentHashMap<>() {};
 
     public UndergroundSystem() {}
 
@@ -42,10 +45,23 @@ public class UndergroundSystem {
         final String tripKey = tripKey(srcStation, destStation);
         final long delta = endTime - checkInEvent.startTime();
 
-        tripsStatistic.compute(
-                tripKey,
-                (keyNotUsed, stat) ->
-                        stat == null ? new TripStat(delta) : stat.updateOneTrip(delta));
+        // 'compute' may block threads that interacts with the same bucket, so better to use
+        // 'putIfAbsent'
+        //        tripsStatistic.compute(
+        //                tripKey,
+        //                (keyNotUsed, stat) ->
+        //                        stat == null ? new TripStat(delta) : stat.updateOneTrip(delta));
+
+        TripStat stat = tripsStatistic.get(tripKey);
+        if (stat == null) {
+            TripStat candidate = new TripStat(delta);
+            TripStat existing = tripsStatistic.putIfAbsent(tripKey, candidate);
+            if (existing == null) {
+                return; // candidate already contains this trip
+            }
+            stat = existing;
+        }
+        stat.updateOneTrip(delta);
     }
 
     public double getAverageTime(String startStation, String endStation) {
@@ -67,24 +83,25 @@ public class UndergroundSystem {
 
     record CheckInEvent(String stationName, int startTime) {}
 
-    private static final class TripStat {
-        long totalTime;
-        long totalCount;
+    private record TripStat(AtomicReference<SumAndCount> reference) {
 
-        TripStat(long delta) {
-            totalTime = delta;
-            totalCount = 1;
+        private TripStat(long reference) {
+            this(new AtomicReference<>(new SumAndCount(reference, 1)));
         }
 
         public TripStat updateOneTrip(long delta) {
-            totalTime += delta;
-            ++totalCount;
+            reference.updateAndGet(
+                    sumAndCount -> new SumAndCount(sumAndCount.sum + delta, sumAndCount.count + 1));
 
             return this;
         }
 
         public double calculateAverage() {
-            return ((double) totalTime) / totalCount;
+            final SumAndCount snapshot = reference.get();
+
+            return ((double) snapshot.sum()) / snapshot.count();
         }
     }
+
+    record SumAndCount(long sum, long count) {}
 }
