@@ -1,6 +1,5 @@
 package com.github.mstepan.leetcode.medium;
 
-import java.math.BigInteger;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -11,7 +10,7 @@ import java.util.Optional;
  */
 public class MaximumNonNegativeProductInMatrix {
 
-    private static final BigInteger MODULO = BigInteger.valueOf(1_000_000_007L);
+    private static final long MODULO = 1_000_000_007L;
 
     /**
      * time: O(N*M)
@@ -29,25 +28,23 @@ public class MaximumNonNegativeProductInMatrix {
         for (int row = 0; row < rows; ++row) {
             for (int col = 0; col < cols; ++col) {
 
-                final BigInteger curValue = BigInteger.valueOf(grid[row][col]);
+                final long curValue = grid[row][col];
 
-                if (curValue.signum() == 0) {
-                    res[row][col] =
-                            new CellSolution(
-                                    Optional.of(BigInteger.ZERO), Optional.of(BigInteger.ZERO));
+                if (curValue == 0) {
+                    res[row][col] = new CellSolution(Optional.of(0L), Optional.of(0L));
                     continue;
                 }
 
                 if (row == 0 && col == 0) {
-                    if (curValue.signum() >= 0) {
+                    if (curValue >= 0) {
                         res[0][0] = new CellSolution(Optional.empty(), Optional.of(curValue));
                     } else {
                         res[0][0] = new CellSolution(Optional.of(curValue), Optional.empty());
                     }
 
                 } else {
-                    Optional<BigInteger> minNegative = Optional.empty();
-                    Optional<BigInteger> maxPositive = Optional.empty();
+                    Optional<Long> minNegative = Optional.empty();
+                    Optional<Long> maxPositive = Optional.empty();
 
                     // not the 0-th column
                     if (col > 0) {
@@ -71,28 +68,26 @@ public class MaximumNonNegativeProductInMatrix {
 
         CellSolution finalResult = res[rows - 1][cols - 1];
 
-        return finalResult.maxPositive.map(value -> value.mod(MODULO).intValue()).orElse(-1);
+        return finalResult.maxPositive.map(value -> (int) (value % MODULO)).orElse(-1);
     }
 
-    private static Optional<BigInteger> minNegative(
-            Optional<BigInteger> minNegative, BigInteger curValue, CellSolution adjCell) {
+    private static Optional<Long> minNegative(
+            Optional<Long> minNegative, long curValue, CellSolution adjCell) {
 
-        Optional<BigInteger> best = minNegative;
+        Optional<Long> best = minNegative;
 
         if (adjCell.maxPositive.isPresent()) {
-            BigInteger candidate1 = curValue.multiply(adjCell.maxPositive.get());
+            long candidate1 = curValue * adjCell.maxPositive.get();
 
-            if (candidate1.signum() <= 0
-                    && (best.isEmpty() || candidate1.compareTo(best.get()) < 0)) {
+            if (candidate1 <= 0 && (best.isEmpty() || candidate1 < best.get())) {
                 best = Optional.of(candidate1);
             }
         }
 
         if (adjCell.minNegative.isPresent()) {
-            BigInteger candidate1 = curValue.multiply(adjCell.minNegative.get());
+            long candidate1 = curValue * adjCell.minNegative.get();
 
-            if (candidate1.signum() <= 0
-                    && (best.isEmpty() || candidate1.compareTo(best.get()) < 0)) {
+            if (candidate1 <= 0 && (best.isEmpty() || candidate1 < best.get())) {
                 best = Optional.of(candidate1);
             }
         }
@@ -100,25 +95,23 @@ public class MaximumNonNegativeProductInMatrix {
         return best;
     }
 
-    private static Optional<BigInteger> maxPositive(
-            Optional<BigInteger> maxPositive, BigInteger curValue, CellSolution adjCell) {
+    private static Optional<Long> maxPositive(
+            Optional<Long> maxPositive, long curValue, CellSolution adjCell) {
 
-        Optional<BigInteger> best = maxPositive;
+        Optional<Long> best = maxPositive;
 
         if (adjCell.maxPositive.isPresent()) {
-            BigInteger candidate1 = curValue.multiply(adjCell.maxPositive.get());
+            long candidate1 = curValue * adjCell.maxPositive.get();
 
-            if (candidate1.signum() >= 0
-                    && (best.isEmpty() || candidate1.compareTo(best.get()) > 0)) {
+            if (candidate1 >= 0 && (best.isEmpty() || candidate1 > best.get())) {
                 best = Optional.of(candidate1);
             }
         }
 
         if (adjCell.minNegative.isPresent()) {
-            BigInteger candidate1 = curValue.multiply(adjCell.minNegative.get());
+            long candidate1 = curValue * adjCell.minNegative.get();
 
-            if (candidate1.signum() >= 0
-                    && (best.isEmpty() || candidate1.compareTo(best.get()) > 0)) {
+            if (candidate1 >= 0 && (best.isEmpty() || candidate1 > best.get())) {
                 best = Optional.of(candidate1);
             }
         }
@@ -126,5 +119,8 @@ public class MaximumNonNegativeProductInMatrix {
         return best;
     }
 
-    record CellSolution(Optional<BigInteger> minNegative, Optional<BigInteger> maxPositive) {}
+    // Long type should be enough here to do not have overflow
+    // max possible value = 4 ** 29 = 288230376151711744L
+    //               Long.MAX_VALUE = 9223372036854775807L
+    record CellSolution(Optional<Long> minNegative, Optional<Long> maxPositive) {}
 }

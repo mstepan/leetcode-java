@@ -9,6 +9,10 @@ public class MaximumNonNegativeProductInMatrixTest {
 
     @Test
     void case1() {
+
+        System.out.println(288230376151711744L);
+        System.out.println(Long.MAX_VALUE);
+
         assertEquals(-1, maxProductPath(new int[][] {{-1, -2, -3}, {-2, -3, -3}, {-3, -3, -2}}));
     }
 
