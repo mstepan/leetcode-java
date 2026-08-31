@@ -1,9 +1,5 @@
 package com.github.mstepan.leetcode.medium;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * 670. Maximum Swap
  *
@@ -27,50 +23,36 @@ public class MaximumSwap {
 
         int[] digits = toDecimalDigits(val);
 
-        for (int i = 0; i < digits.length - 1; ++i) {
+        int maxDigitIdx = digits.length - 1;
+        int[] swapPos = new int[] {digits.length - 1, digits.length - 1};
+
+        // single pass solution
+        for (int i = digits.length - 2; i >= 0; --i) {
             int curDigit = digits[i];
-            int maxDigitIdx = i;
 
-            for (int j = i + 1; j < digits.length; ++j) {
-                if (digits[j] > curDigit && digits[j] >= digits[maxDigitIdx]) {
-                    maxDigitIdx = j;
-                }
-            }
-
-            if (maxDigitIdx != i) {
-                swap(digits, i, maxDigitIdx);
-                break;
+            if (curDigit > digits[maxDigitIdx]) {
+                maxDigitIdx = i;
+            } else if (curDigit < digits[maxDigitIdx]) {
+                swapPos = new int[] {i, maxDigitIdx};
             }
         }
+
+        swap(digits, swapPos[0], swapPos[1]);
 
         return toNumber(digits);
     }
 
-    private static void swap(int[] arr, int i, int j) {
-        int temp = arr[i];
-        arr[i] = arr[j];
-        arr[j] = temp;
-    }
-
     private static int[] toDecimalDigits(int initialVal) {
 
-        List<Integer> digits = new ArrayList<>(9);
+        int digitsCnt = countDigits(initialVal);
 
-        // 123 => [3, 2, 1]
-        for (int val = initialVal; val > 0; val /= 10) {
-            int digit = val % 10;
-            digits.add(digit);
+        int[] arr = new int[digitsCnt];
+
+        for (int i = 0, val = initialVal; i < arr.length && val > 0; ++i, val /= 10) {
+            arr[i] = val % 10;
         }
 
-        // [3, 2, 1] => [1, 2, 3]
-        Collections.reverse(digits);
-
-        int[] arr = new int[digits.size()];
-        var it = digits.iterator();
-
-        for (int i = 0; i < digits.size() && it.hasNext(); ++i) {
-            arr[i] = it.next();
-        }
+        reverseArray(arr);
 
         return arr;
     }
@@ -84,5 +66,31 @@ public class MaximumSwap {
         }
 
         return res;
+    }
+
+    private static int countDigits(int initialVal) {
+        int digitsCnt = 0;
+        for (int val = initialVal; val > 0; val /= 10) {
+            ++digitsCnt;
+        }
+
+        return digitsCnt;
+    }
+
+    private static void reverseArray(int[] arr) {
+        int left = 0;
+        int right = arr.length - 1;
+
+        while (left < right) {
+            swap(arr, left, right);
+            ++left;
+            --right;
+        }
+    }
+
+    private static void swap(int[] arr, int i, int j) {
+        int temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
     }
 }
